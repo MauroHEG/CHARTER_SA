@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1019852036603",
+    "project_id": "charter-bd51b",
+    "storage_bucket": "charter-bd51b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019852036603:android:e35e3aa3e5b9a53d15d35e",
+        "android_client_info": {
+          "package_name": "com.example.charter_appli_travaux_mro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019852036603-uqqi2gs4i89k7t5a2i16v6al3funelgo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3l2nHGSNt2K6Si50zUtTz3MqfoCSWvsE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019852036603-uqqi2gs4i89k7t5a2i16v6al3funelgo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

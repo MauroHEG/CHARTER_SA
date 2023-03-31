@@ -5,9 +5,15 @@ import 'package:charter_appli_travaux_mro/view/acceuil_view.dart';
 import 'package:charter_appli_travaux_mro/view/loginPage_view.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_Profil_view.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_view.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  //initialisation de la Firebase
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions
+          .currentPlatform); //currentPlatform --> va trouver et utiliser les infos firebase propre à chaque OS (android, iOS, web...)
   runApp(const MyApp());
 }
 
