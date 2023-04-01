@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -171,5 +176,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Traiter les données saisie dans le formulaire ici
       },
     );
+  }
+
+  Future<void> _enregistrerUtilisateur() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: _email!, password: _password!);
+      // Utilisateur créé avec succès
+
+      // Enregistrer les autres informations dans Cloud Firestore
+      await FirebaseFirestore.instance
+          .collection('utilisateurs')
+          .doc(userCredential.user!.uid)
+          .set({
+        'prenom': _firstName,
+        'nom': _lastName,
+        'email': _email,
+        'telephone': _phoneNumber,
+        'date_de_naissance': _dateOfBirth,
+      });
+
+      // Naviguer vers l'écran de connexion ou l'écran d'accueil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Gérer les erreurs d'inscription
+      if (e.code == 'weak-password') {
+        print('Le mot de passe est trop faible.');
+      } else if (e.code == 'email-already-in-use') {
+        print('Le compte existe déjà pour cet e-mail.');
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }

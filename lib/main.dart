@@ -5,6 +5,7 @@ import 'package:charter_appli_travaux_mro/view/acceuil_view.dart';
 import 'package:charter_appli_travaux_mro/view/loginPage_view.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_Profil_view.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_view.dart';
+import 'package:charter_appli_travaux_mro/view/signup_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
         ),
         home: AppBar_profil_view(
           title: AppStrings.acceuil,
-          page: Acceuil_view(),
+          page: SignUpScreen(),
         )
         /*AppBar_view(
           title: AppStrings.acceuil,
