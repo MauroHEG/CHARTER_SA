@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
 import 'signup_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -71,8 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
             _formKey.currentState?.save();
-
             // Process the entered data here
+            _seConnecter();
           },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF7BF853),
@@ -93,5 +96,38 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
+  }
+
+  Future<String> _recupererNom(String userId) async {
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+        .collection('utilisateurs')
+        .doc(userId)
+        .get();
+    return documentSnapshot.get('nom');
+  }
+
+  Future<void> _seConnecter() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: _email, password: _password);
+      String userId = userCredential.user!.uid;
+      String nom = await _recupererNom(userId);
+      // Connexion réussie, naviguer vers l'écran d'accueil ou autre écran approprié
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                    avatarPath: '',
+                    fullName: nom,
+                  )));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print("Aucun utilisateur trouvé pour cet e-mail.");
+      } else if (e.code == 'wrong-password') {
+        print("Le mot de passe est incorrect.");
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
