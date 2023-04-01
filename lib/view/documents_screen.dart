@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/firestore_service.dart';
+import 'contenu_dossier_screen.dart';
 
 class DocumentsScreen extends StatefulWidget {
   @override
@@ -52,6 +53,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   Widget _buildDossierItem(DocumentSnapshot dossier, int index) {
     String nomDossier = dossier.get('nom');
+    String dossierId = dossier.id;
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -66,7 +68,15 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
         onTap: () {
-          // Naviguer vers le contenu du dossier
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ContenuDossierScreen(
+                dossierId: dossierId,
+                dossierNom: nomDossier,
+              ),
+            ),
+          );
         },
       ),
     );
