@@ -174,6 +174,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _formKey.currentState?.save();
 
         // Traiter les données saisie dans le formulaire ici
+        if (!_formKey.currentState!.validate()) return;
+        _formKey.currentState?.save();
+        _enregistrerUtilisateur();
       },
     );
   }
