@@ -1,4 +1,4 @@
-import 'dart:html';
+//import 'dart:html';
 
 import 'package:charter_appli_travaux_mro/utils/appStrings.dart';
 import 'package:charter_appli_travaux_mro/view/acceuil_view.dart';
@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 void main() async {
   //initialisation de la Firebase
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions
           .currentPlatform); //currentPlatform --> va trouver et utiliser les infos firebase propre à chaque OS (android, iOS, web...)

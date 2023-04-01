@@ -44,7 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               _buildPasswordField(),
               _buildConfirmPasswordField(),
               _buildPhoneNumberField(),
-              _buildDateOfBirthField(),
+              //_buildDateOfBirthField(),
               _buildSignUpButton(),
             ],
           ),
@@ -76,7 +76,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildEmailField() {
-    String? _email;
     return TextFormField(
       decoration: InputDecoration(labelText: 'Email'),
       validator: (String? value) {
@@ -90,7 +89,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildPasswordField() {
-    String? _password;
     return TextFormField(
       decoration: InputDecoration(labelText: 'Mot de passe'),
       obscureText: true,
@@ -131,7 +129,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildDateOfBirthField() {
+  /*Widget _buildDateOfBirthField() {
     return GestureDetector(
       onTap: () async {
         DateTime? date = await showDatePicker(
@@ -161,7 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
-  }
+  }*/
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
@@ -170,8 +168,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       child: Text('S\'inscrire'),
       onPressed: () {
-        if (!_formKey.currentState!.validate()) return;
-        _formKey.currentState?.save();
+        /*if (_formKey.currentState == null || !_formKey.currentState!.validate())
+          return;
+        _formKey.currentState?.save();*/
 
         // Traiter les données saisie dans le formulaire ici
         if (!_formKey.currentState!.validate()) return;
@@ -196,7 +195,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'nom': _lastName,
         'email': _email,
         'telephone': _phoneNumber,
-        'date_de_naissance': _dateOfBirth,
       });
 
       // Naviguer vers l'écran de connexion ou l'écran d'accueil
