@@ -3,6 +3,7 @@
 import 'package:charter_appli_travaux_mro/utils/appStrings.dart';
 import 'package:charter_appli_travaux_mro/view/acceuil_view.dart';
 import 'package:charter_appli_travaux_mro/view/loginPage_view.dart';
+import 'package:charter_appli_travaux_mro/view/login_screen.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_Profil_view.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_view.dart';
 import 'package:charter_appli_travaux_mro/view/signup_screen.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
         ),
         home: AppBar_profil_view(
           title: AppStrings.acceuil,
-          page: SignUpScreen(),
+          page: LoginScreen(),
         )
         /*AppBar_view(
           title: AppStrings.acceuil,

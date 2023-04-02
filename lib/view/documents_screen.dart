@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'services/firestore_service.dart';
 import 'contenu_dossier_screen.dart';
+import 'services/firestore_service.dart';
 
 class DocumentsScreen extends StatefulWidget {
   @override
