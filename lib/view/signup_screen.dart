@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../utils/appStrings.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -32,21 +33,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
-        color: Color(0xFFD9F5D0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              _buildFirstNameField(),
-              _buildLastNameField(),
-              _buildEmailField(),
-              _buildPasswordField(),
-              _buildConfirmPasswordField(),
-              _buildPhoneNumberField(),
-              //_buildDateOfBirthField(),
-              _buildSignUpButton(),
-            ],
+        decoration: BoxDecoration(
+          color: Color(0xFFD9F5D0),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Image(
+                    image: AssetImage(AppStrings.cheminLogo),
+                  ),
+                  SizedBox(height: 30),
+                  _buildFirstNameField(),
+                  _buildLastNameField(),
+                  _buildEmailField(),
+                  _buildPasswordField(),
+                  _buildConfirmPasswordField(),
+                  _buildPhoneNumberField(),
+                  //_buildDateOfBirthField(),
+                  SizedBox(height: 30),
+                  _buildSignUpButton(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -164,9 +176,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildSignUpButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        primary: Color(0xFF7BF853),
-      ),
-      child: Text('S\'inscrire'),
+          primary: Color(0xFF7BF853), minimumSize: Size(200, 60)),
+      child: Text("S'inscrire", style: TextStyle(fontSize: 20)),
       onPressed: () {
         /*if (_formKey.currentState == null || !_formKey.currentState!.validate())
           return;
