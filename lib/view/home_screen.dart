@@ -1,6 +1,7 @@
 import 'package:charter_appli_travaux_mro/view/reservation_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/appStrings.dart';
 import 'avis_screen.dart';
 import 'documents_screen.dart';
 import 'offres_charter_screen.dart';
@@ -57,15 +58,26 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Center(
-        child: AspectRatio(
-          aspectRatio: 1, // Ajuster le rapport hauteur/largeur ici
-          child: GridView.count(
-            crossAxisCount: 2,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
             children: [
-              _buildHomeButton('Mes documents', Icons.folder),
-              _buildHomeButton('Mes réservations', Icons.calendar_today),
-              _buildHomeButton('Avis', Icons.rate_review),
-              _buildHomeButton('Offres Charter', Icons.local_offer),
+              Image(
+                image: AssetImage(AppStrings.cheminLogo),
+              ),
+              SizedBox(height: 80),
+              AspectRatio(
+                aspectRatio: 1, // Ajuster le rapport hauteur/largeur ici
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  children: [
+                    _buildHomeButton('Mes documents', Icons.folder),
+                    _buildHomeButton('Mes réservations', Icons.calendar_today),
+                    _buildHomeButton('Avis', Icons.rate_review),
+                    _buildHomeButton('Offres Charter', Icons.local_offer),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
