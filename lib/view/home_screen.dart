@@ -1,9 +1,11 @@
 import 'package:charter_appli_travaux_mro/view/reservation_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/appStrings.dart';
 import 'avis_screen.dart';
 import 'documents_screen.dart';
+import 'login_screen.dart';
 import 'offres_charter_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: Text('Se déconnecter'),
                         onTap: () {
                           // Déconnexion et redirection vers la page de connexion
+                          _deconnexionEtRedirection();
                         },
                       ),
                     ],
@@ -130,6 +133,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _deconnexionEtRedirection() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
     );
   }
 }
