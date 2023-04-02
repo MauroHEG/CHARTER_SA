@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/appStrings.dart';
 import 'home_screen.dart';
 import 'signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,17 +22,28 @@ class _LoginScreenState extends State<LoginScreen> {
         title: Text('Connexion', style: TextStyle(color: Colors.black)),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
-        color: Color(0xFFD9F5D0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Image.asset(''),
-              _buildEmailField(),
-              _buildPasswordField(),
-              _buildLoginAndSignUpButtons(),
-            ],
+        decoration: BoxDecoration(
+          color: Color(0xFFD9F5D0),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Image(
+                    image: AssetImage(AppStrings.cheminLogo),
+                  ),
+                  SizedBox(
+                      height:
+                          80), // Ajoutez cette ligne pour ajouter de l'espace en dessous de l'image
+                  _buildEmailField(),
+                  _buildPasswordField(),
+                  _buildLoginAndSignUpButtons(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -64,12 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
       onSaved: (String? value) => _password = value!,
     );
   }
-// ...
 
   Widget _buildLoginAndSignUpButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        SizedBox(
+            height:
+                80), // Ajoutez cette ligne pour ajouter de l'espace au-dessus du bouton de connexion
         ElevatedButton(
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
@@ -79,9 +93,16 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF7BF853),
+            minimumSize: Size(200, 60), // Modifiez la taille du bouton ici
+            padding: EdgeInsets.symmetric(
+                horizontal: 20), // Modifiez le padding ici si nécessaire
           ),
-          child: Text('Connexion'),
+          child: Text('Connexion',
+              style: TextStyle(
+                  fontSize:
+                      20)), // Modifiez la taille du texte ici si nécessaire
         ),
+        SizedBox(height: 30), // Modifiez la hauteur si nécessaire
         ElevatedButton(
           onPressed: () {
             Navigator.push(
@@ -91,8 +112,14 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF7BF853),
+            minimumSize: Size(200, 60), // Modifiez la taille du bouton ici
+            padding: EdgeInsets.symmetric(
+                horizontal: 20), // Modifiez le padding ici si nécessaire
           ),
-          child: Text("S'inscrire"),
+          child: Text("S'inscrire",
+              style: TextStyle(
+                  fontSize:
+                      20)), // Modifiez la taille du texte ici si nécessaire
         ),
       ],
     );
