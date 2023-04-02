@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_info_provider.dart';
 import '../utils/appStrings.dart';
 import 'home_screen.dart';
 import 'signup_screen.dart';
@@ -139,7 +141,14 @@ class _LoginScreenState extends State<LoginScreen> {
           .signInWithEmailAndPassword(email: _email, password: _password);
       String userId = userCredential.user!.uid;
       String nom = await _recupererNom(userId);
-      // Connexion réussie, naviguer vers l'écran d'accueil ou autre écran approprié
+
+      // Récupérez le rôle de l'utilisateur
+      String role = await _recupererRole(userId);
+
+      // Stockez le rôle dans le UserInfoProvider
+      Provider.of<UserInfoProvider>(context, listen: false).setRole(role);
+
+      // Connexion réussie, naviguer vers l'écran d'accueil
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -156,5 +165,15 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<String> _recupererRole(String userId) async {
+    DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore
+        .instance
+        .collection('utilisateurs')
+        .doc(userId)
+        .get();
+    return doc.data()?['role'] ??
+        'role'; // Utilisez la clé correspondant au champ 'role' dans votre base de données
   }
 }

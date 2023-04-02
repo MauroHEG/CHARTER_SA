@@ -206,6 +206,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'nom': _lastName,
         'email': _email,
         'telephone': _phoneNumber,
+        'role': 'user'
       });
 
       // Naviguer vers l'écran de connexion ou l'écran d'accueil

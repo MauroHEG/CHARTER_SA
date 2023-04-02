@@ -138,9 +138,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _deconnexionEtRedirection() async {
     await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
+      (Route<dynamic> route) =>
+          false, // Cette condition permet de supprimer toutes les routes en dessous de la nouvelle route
     );
   }
 }
