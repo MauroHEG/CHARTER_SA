@@ -1,6 +1,11 @@
+import 'package:charter_appli_travaux_mro/web_admin/screens/reservations_list_page.dart';
+import 'package:charter_appli_travaux_mro/web_admin/screens/review_list_page.dart';
+import 'package:charter_appli_travaux_mro/web_admin/screens/user_list_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/appStrings.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   @override
@@ -33,86 +38,152 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         backgroundColor: Color(0xFF7BF853),
         title: Text('Tableau de bord', style: TextStyle(color: Colors.black)),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Statistiques',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 16),
-              FutureBuilder(
-                future: Future.wait([
-                  _getNombreTotalUtilisateurs(),
-                  _getNombreTotalAvis(),
-                  _getNombreTotalReservations(),
-                ]),
-                builder:
-                    (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  int totalUtilisateurs = snapshot.data![0];
-                  int totalAvis = snapshot.data![1];
-                  int totalReservations = snapshot.data![2];
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 50.0),
+                    child: Image(
+                      image: AssetImage(AppStrings.cheminLogo),
+                    ),
+                  ),
+                ),
+                Text(
+                  'Statistiques',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                FutureBuilder(
+                  future: Future.wait([
+                    _getNombreTotalUtilisateurs(),
+                    _getNombreTotalAvis(),
+                    _getNombreTotalReservations(),
+                  ]),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<int>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    int totalUtilisateurs = snapshot.data![0];
+                    int totalAvis = snapshot.data![1];
+                    int totalReservations = snapshot.data![2];
 
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildStatCard(
-                          'Utilisateurs', totalUtilisateurs, Colors.blue),
-                      _buildStatCard('Avis', totalAvis, Colors.red),
-                      _buildStatCard(
-                          'Réservations', totalReservations, Colors.green),
-                    ],
-                  );
-                },
-              ),
-              SizedBox(height: 24),
-              Text(
-                'Réservations par mois',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 16),
-              Container(
-                height: 200,
-                child: _buildReservationsChart(),
-              ),
-            ],
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildStatCard(context, 'Utilisateurs',
+                            totalUtilisateurs, Colors.blue, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => UserListPage()),
+                          );
+                        }),
+                        _buildStatCard(context, 'Avis', totalAvis, Colors.red,
+                            () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReviewsListPage()),
+                          );
+                        }),
+                        _buildStatCard(context, 'Réservations',
+                            totalReservations, Colors.green, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReservationsListPage()),
+                          );
+                        }),
+                        _buildStatCard(context, 'Offres Charter', totalAvis,
+                            Color.fromARGB(255, 200, 54, 244), () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReviewsListPage()),
+                          );
+                        }),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(height: 24),
+                Text(
+                  'Réservations par mois',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  height: 200,
+                  child: _buildReservationsChart(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildStatCard(String title, int value, Color color) {
+  Widget _buildStatCard(BuildContext context, String title, int value,
+      Color color, Null Function() param4) {
     return Expanded(
-      child: Card(
-        color: color,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+      child: Container(
+        width: double.infinity,
+        child: Card(
+          color: color,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: InkWell(
+              onTap: () {
+                switch (title) {
+                  case 'Utilisateurs':
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UserListPage()));
+                    break;
+                  case 'Avis':
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReviewsListPage()));
+                    break;
+                  case 'Réservations':
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReservationsListPage()));
+                    break;
+                }
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  Text(
+                    value.toString(),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ],
               ),
-              Text(
-                value.toString(),
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -130,7 +201,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         lineBarsData: [
           LineChartBarData(
             spots: [
-// Remplacez ces valeurs par les données réelles de réservations par mois
+// Remplacer ces valeurs par les données réelles de réservations par mois
               FlSpot(0, 20),
               FlSpot(1, 30),
               FlSpot(2, 50),
