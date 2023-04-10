@@ -162,6 +162,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         MaterialPageRoute(
                             builder: (context) => ReservationsListPage()));
                     break;
+                  case 'Offres Charter':
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OffresListPage()));
+                    break;
                 }
               },
               child: Column(
