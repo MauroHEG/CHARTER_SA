@@ -8,118 +8,147 @@ class ReservationsListPage extends StatefulWidget {
 }
 
 class _ReservationsListPageState extends State<ReservationsListPage> {
+  // Récupérer la collection "reservations" depuis Firebase
+  final Stream<QuerySnapshot> _reservationsStream =
+      FirebaseFirestore.instance.collection('reservations').snapshots();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Liste des réservations'),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('reservations')
-            .orderBy('pays')
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          // Group reservations by country
-          Map<String, List<QueryDocumentSnapshot>> reservationsParPays = {};
-          for (var doc in snapshot.data!.docs) {
-            final pays = doc['pays'];
-            if (reservationsParPays.containsKey(pays)) {
-              reservationsParPays[pays]!.add(doc);
-            } else {
-              reservationsParPays[pays] = [doc];
+        appBar: AppBar(
+          title: Text('Liste des réservations'),
+        ),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _reservationsStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Erreur: ${snapshot.error}');
             }
-          }
 
-          return ListView(
-            children: reservationsParPays.keys.map((pays) {
-              return ListTile(
-                title: Text(pays),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReservationsParVillePage(
-                          pays, reservationsParPays[pays]!),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ReservationFormPage()),
-          );
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
-    );
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text('Chargement...');
+            }
+
+            // Affichage de la liste des réservations
+            return ListView(
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data =
+                    document.data() as Map<String, dynamic>;
+                return InkWell(
+                  onTap: () {
+                    // Naviguer vers la page de détail de la réservation
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReservationDetailPage(
+                          reservationData: data,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ListTile(
+                    title: Text(data['nomPays']),
+                    subtitle: Text(data['utilisateur']),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Naviguer vers la page de formulaire de réservation
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReservationFormPage(),
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+          tooltip: 'Créer une réservation',
+        ));
   }
 }
 
-class ReservationsParVillePage extends StatelessWidget {
-  final String pays;
-  final List<QueryDocumentSnapshot> reservations;
+class ReservationDetailPage extends StatelessWidget {
+  final Map<String, dynamic> reservationData;
 
-  ReservationsParVillePage(this.pays, this.reservations);
+  ReservationDetailPage({required this.reservationData});
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List<QueryDocumentSnapshot>> reservationsParVille = {};
-    for (var doc in reservations) {
-      final ville = doc['ville'];
-      if (reservationsParVille.containsKey(ville)) {
-        reservationsParVille[ville]!.add(doc);
-      } else {
-        reservationsParVille[ville] = [doc];
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Réservations en $pays'),
+        title: Text('Détail de la réservation'),
       ),
-      body: ListView(
-        children: reservationsParVille.entries.map((entry) {
-          String ville = entry.key;
-          List<QueryDocumentSnapshot> reservations = entry.value;
-
-          return ExpansionTile(
-            title: Text(ville),
-            children: reservations.map((doc) {
-              Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
-              return Dismissible(
-                key: Key(doc.id),
-                onDismissed: (direction) {
-                  FirebaseFirestore.instance
-                      .collection('reservations')
-                      .doc(doc.id)
-                      .delete();
-                },
-                background: Container(color: Colors.red),
-                child: ListTile(
-                  title: Text('Réservation ${doc.id}'),
-                  subtitle: Text(
-                      'Utilisateur: ${data['utilisateur']}\nHôtel: ${data['nomHotel']}\nDates: ${data['dateDebut']} - ${data['dateFin']}'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Informations générales',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text('Nom du pays: ${reservationData['nomPays']}'),
+                      SizedBox(height: 5),
+                      Text('Utilisateur: ${reservationData['utilisateur']}'),
+                      SizedBox(height: 5),
+                      Text("Nom de l'hôtel: ${reservationData['nomHotel']}"),
+                      SizedBox(height: 5),
+                      Text('Ville: ${reservationData['nomVille']}'),
+                      SizedBox(height: 5),
+                      Text(
+                          "Adresse de l'hôtel: ${reservationData['adresseHotel']}"),
+                    ],
+                  ),
                 ),
-              );
-            }).toList(),
-          );
-        }).toList(),
+              ),
+              SizedBox(height: 10),
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Détails du voyage',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                          "Description du voyage: ${reservationData['descriptionVoyage']}"),
+                      SizedBox(height: 5),
+                      Text("Prix payé: ${reservationData['prixPaye']}"),
+                      SizedBox(height: 5),
+                      Text(
+                          "Heure de décollage départ: ${reservationData['heureDecollageDepart']}"),
+                      SizedBox(height: 5),
+                      Text(
+                          "Heure de décollage arrivée: ${reservationData['heureDecollageArrivee']}"),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

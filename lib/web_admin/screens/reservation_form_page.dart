@@ -2,12 +2,40 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ReservationFormPage extends StatefulWidget {
+  final Map<String, dynamic>? reservationData;
+  final bool isEditMode;
+
+  ReservationFormPage({this.reservationData, this.isEditMode = false});
+
   @override
   _ReservationFormPageState createState() => _ReservationFormPageState();
 }
 
 class _ReservationFormPageState extends State<ReservationFormPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.isEditMode && widget.reservationData != null) {
+      _selectedUser = widget.reservationData!['utilisateur'];
+      _nomHotel = widget.reservationData!['nomHotel'];
+      _nomPays = widget.reservationData!['nomPays'];
+      _nomVille = widget.reservationData!['nomVille'];
+      _localisationAeroportDepart =
+          widget.reservationData!['localisationAeroportDepart'];
+      _localisationAeroportArrivee =
+          widget.reservationData!['localisationAeroportArrivee'];
+      _adresseHotel = widget.reservationData!['adresseHotel'];
+      _descriptionVoyage = widget.reservationData!['descriptionVoyage'];
+      _prixPaye = widget.reservationData!['prixPaye'];
+      _heureDecollageDepart = TimeOfDay.fromDateTime(
+          DateTime.parse(widget.reservationData!['heureDecollageDepart']));
+      _heureDecollageArrivee = TimeOfDay.fromDateTime(
+          DateTime.parse(widget.reservationData!['heureDecollageArrivee']));
+    }
+  }
 
   // Variables pour stocker les données du formulaire
   String? _selectedUser;
@@ -147,10 +175,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          // Ajouter la réservation à Firebase
-                          FirebaseFirestore.instance
-                              .collection('reservations')
-                              .add({
+                          // Créez un objet Map contenant les données de la réservation
+                          Map<String, dynamic> reservationData = {
                             'utilisateur': _selectedUser,
                             'nomHotel': _nomHotel,
                             'nomPays': _nomPays,
@@ -168,13 +194,34 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                                 _heureDecollageDepart?.format(context),
                             'heureDecollageArrivee':
                                 _heureDecollageArrivee?.format(context),
-                          }).then((value) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Réservation créée'),
-                              ),
-                            );
-                            Navigator.pop(context);
+                          };
+
+                          // Ajouter la réservation à la collection "reservations" de Firebase
+                          FirebaseFirestore.instance
+                              .collection('reservations')
+                              .add(reservationData)
+                              .then((value) {
+                            // Ajouter la réservation à la sous-collection "reservations" de l'utilisateur
+                            FirebaseFirestore.instance
+                                .collection('utilisateurs')
+                                .doc(_selectedUser)
+                                .collection('reservations')
+                                .doc(value.id)
+                                .set(reservationData)
+                                .then((value) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Réservation créée'),
+                                ),
+                              );
+                              Navigator.pop(context);
+                            }).catchError((error) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Erreur: $error'),
+                                ),
+                              );
+                            });
                           }).catchError((error) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
