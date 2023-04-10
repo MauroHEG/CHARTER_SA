@@ -72,10 +72,34 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
   }
 }
 
-class ReservationDetailPage extends StatelessWidget {
+class ReservationDetailPage extends StatefulWidget {
   final Map<String, dynamic> reservationData;
 
   ReservationDetailPage({required this.reservationData});
+
+  @override
+  _ReservationDetailPageState createState() => _ReservationDetailPageState();
+}
+
+class _ReservationDetailPageState extends State<ReservationDetailPage> {
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserName();
+  }
+
+  Future<void> fetchUserName() async {
+    String userId = widget.reservationData['utilisateur'];
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+        .collection('utilisateurs')
+        .doc(userId)
+        .get();
+    setState(() {
+      _userName = (userSnapshot.data() as Map<String, dynamic>)['nom'];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,16 +127,17 @@ class ReservationDetailPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Text('Nom du pays: ${reservationData['nomPays']}'),
+                      Text('Nom du pays: ${widget.reservationData['nomPays']}'),
                       SizedBox(height: 5),
-                      Text('Utilisateur: ${reservationData['utilisateur']}'),
-                      SizedBox(height: 5),
-                      Text("Nom de l'hôtel: ${reservationData['nomHotel']}"),
-                      SizedBox(height: 5),
-                      Text('Ville: ${reservationData['nomVille']}'),
+                      Text('Utilisateur: ${_userName ?? 'Chargement...'}'),
                       SizedBox(height: 5),
                       Text(
-                          "Adresse de l'hôtel: ${reservationData['adresseHotel']}"),
+                          "Nom de l'hôtel: ${widget.reservationData['nomHotel']}"),
+                      SizedBox(height: 5),
+                      Text('Ville: ${widget.reservationData['nomVille']}'),
+                      SizedBox(height: 5),
+                      Text(
+                          "Adresse de l'hôtel: ${widget.reservationData['adresseHotel']}"),
                     ],
                   ),
                 ),
@@ -133,15 +158,15 @@ class ReservationDetailPage extends StatelessWidget {
                       ),
                       SizedBox(height: 10),
                       Text(
-                          "Description du voyage: ${reservationData['descriptionVoyage']}"),
+                          "Description du voyage: ${widget.reservationData['descriptionVoyage']}"),
                       SizedBox(height: 5),
-                      Text("Prix payé: ${reservationData['prixPaye']}"),
-                      SizedBox(height: 5),
-                      Text(
-                          "Heure de décollage départ: ${reservationData['heureDecollageDepart']}"),
+                      Text("Prix payé: ${widget.reservationData['prixPaye']}"),
                       SizedBox(height: 5),
                       Text(
-                          "Heure de décollage arrivée: ${reservationData['heureDecollageArrivee']}"),
+                          "Heure de décollage départ: ${widget.reservationData['heureDecollageDepart']}"),
+                      SizedBox(height: 5),
+                      Text(
+                          "Heure de décollage arrivée: ${widget.reservationData['heureDecollageArrivee']}"),
                     ],
                   ),
                 ),
