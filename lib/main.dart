@@ -39,6 +39,6 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.green,
           backgroundColor: Color(0xFFD9F5D0),
         ),
-        home: AdminDashboardScreen());
+        home: SignUpScreen());
   }
 }
