@@ -60,11 +60,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-<<<<<<< HEAD
   test: ^1.23.1
-=======
-  test: ^1.22.0
->>>>>>> b5fd53eb3bf0d43f3e0b40e2ea4ff0d02c97371b
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
