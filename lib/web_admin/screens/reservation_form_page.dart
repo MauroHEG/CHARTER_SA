@@ -12,6 +12,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
   // Variables pour stocker les données du formulaire
   String? _selectedUser;
   String? _nomHotel;
+  String? _nomPays;
+  String? _nomVille;
   String? _localisationAeroportDepart;
   String? _localisationAeroportArrivee;
   String? _adresseHotel;
@@ -72,6 +74,14 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                   TextFormField(
                     decoration: InputDecoration(labelText: "Nom de l'hôtel"),
                     onChanged: (value) => _nomHotel = value,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Pays"),
+                    onChanged: (value) => _nomPays = value,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Ville"),
+                    onChanged: (value) => _nomVille = value,
                   ),
                   TextFormField(
                     decoration: InputDecoration(
@@ -143,6 +153,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                               .add({
                             'utilisateur': _selectedUser,
                             'nomHotel': _nomHotel,
+                            'nomPays': _nomPays,
+                            'nomVille': _nomVille,
                             'localisationAeroportDepart':
                                 _localisationAeroportDepart,
                             'localisationAeroportArrivee':

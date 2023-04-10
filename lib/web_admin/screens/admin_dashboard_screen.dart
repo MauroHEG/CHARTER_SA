@@ -1,3 +1,4 @@
+import 'package:charter_appli_travaux_mro/web_admin/screens/offres_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/reservations_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/review_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/user_list_page.dart';
@@ -106,7 +107,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ReviewsListPage()),
+                                builder: (context) => OffresListPage()),
                           );
                         }),
                       ],
