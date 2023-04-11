@@ -1,3 +1,4 @@
+import 'package:charter_appli_travaux_mro/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,8 @@ void main() async {
     //Code nettoyer bdd
   });*/
   //Initialisation de la cloud firebase
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  //WidgetsFlutterBinding.ensureInitialized();
+  //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   group('Utilisateur unique', () {
     //Création d'un utilisateur inexistant sur une FakeFirebase (bdd pour les tests)
@@ -28,7 +29,7 @@ void main() async {
           .createUserWithEmailAndPassword(
               email: 'elvio.vic@gmail.com', password: 'mdp123!test');
 
-      await FirebaseFirestore.instance
+      await fakeFirestore
           .collection('utilisateurs')
           .doc(userCredential.user!.uid)
           .set({
