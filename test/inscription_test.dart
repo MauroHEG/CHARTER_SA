@@ -2,46 +2,56 @@ import 'package:charter_appli_travaux_mro/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:test/test.dart';
-import 'package:charter_appli_travaux_mro/view/signup_screen.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 //Test unitaire pour la fonctionnalitée "Inscription" --> [signup_screen.dart]
 void main() async {
-  //setUp() est appelée avant chaque test (nettoyer bdd)
-  /*setUp(() {
-    //Code nettoyer bdd
-  });*/
-  //Initialisation de la cloud firebase
-  //WidgetsFlutterBinding.ensureInitialized();
-  //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  group('Test de la fonctionnalitée Inscription :', () {
+    //variable firestore avec le mot clé "late" pour indiquer que sa valeur sera initialisée ultérieurement
+    late FirebaseFirestore firestore;
 
-  group('Utilisateur unique', () {
+    //setUp() appelée avant l'exécution de chaque test (initialiser ressources dont les tests auront besoins)
+    setUp(() async {
+      //Initialisation de la cloud firebase
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+      // Utilisez une instance différente de la base de données pour chaque test
+      firestore = FirebaseFirestore.instance;
+    });
+
+    //tearDown() appelée après l'éxecution de chaque test (nettoyer ressources initialisier par setUp())
+    tearDown(() async {
+      //vider la persistence locale
+      await firestore.clearPersistence();
+      //terminer la connexion firestore
+      await firestore.terminate();
+    });
+
     //Création d'un utilisateur inexistant sur une FakeFirebase (bdd pour les tests)
-    test('test fonctionnalitée : _enregistrerUtilisateur()', () async {
-      // Créer une instance de FakeFirebaseFirestore
-      final fakeFirestore = FakeFirebaseFirestore();
+    test('test inscription nouvel utilisateur', () async {
+      // Initialiser les entrées de l'utilisateur
+      final prenom = 'elvio';
+      final nom = 'Dupont';
+      final email = 'elvio.vic@gmail.com';
+      final password = 'mdp123!test';
+      final telephone = '0779415789';
+      final role = 'user';
 
-      // Créer une instance de FirebaseAuth avec un utilisateur enregistré
-      final userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: 'elvio.vic@gmail.com', password: 'mdp123!test');
+      // Exécuter la fonctionnalité d'inscription
+      final result = await (username, password);
 
-      await fakeFirestore
-          .collection('utilisateurs')
-          .doc(userCredential.user!.uid)
-          .set({
-        'prenom': "elvio",
-        'nom': "Dupont",
-        'email': "elvio.vic@gmail.com",
-        'telephone': "0779415789",
-        'role': 'user'
-      });
+      // Vérifier que l'inscription s'est bien déroulée
+      expect(result, true);
+
+      // Vérifier que l'utilisateur a été ajouté à la base de données
+      final user = await firestore.collection('users').doc(username).get();
+      expect(user.exists, true);
 
       // Vérifier que l'utilisateur a été enregistré dans Firestore
-      final snapshot = await fakeFirestore
+      /*final snapshot = await fakeFirestore
           .collection('utilisateurs')
           .doc(userCredential.user!.uid)
           .get();
@@ -50,7 +60,7 @@ void main() async {
       expect(snapshot.data()!['nom'], equals('Dupont'));
       expect(snapshot.data()!['email'], equals('elvio.vic@gmail.com'));
       expect(snapshot.data()!['telephone'], equals('0779415789'));
-      expect(snapshot.data()!['role'], equals('user'));
+      expect(snapshot.data()!['role'], equals('user'));*/
       /*final instance = FakeFirebaseFirestore();
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
