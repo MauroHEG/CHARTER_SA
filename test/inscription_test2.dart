@@ -8,24 +8,22 @@ import 'package:firebase_core/firebase_core.dart';
 
 //Test unitaire pour la fonctionnalitée "Inscription" --> [signup_screen.dart]
 void main() async {
+
+
   group('Test de la fonctionnalitée Inscription :', () {
     //variable firestore avec le mot clé "late" pour indiquer que sa valeur sera initialisée ultérieurement
-    FirebaseApp secondaryApp = Firebase.app("secondaryApp");
-
     late FirebaseFirestore firestore;
+    print(FirebaseFirestore.instance.collection(collectionPath));
 
     //setUp() appelée avant l'exécution de chaque test (initialiser ressources dont les tests auront besoins)
     setUp(() async {
-
       //Initialisation de la cloud firebase
       WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform
           );
-
       // Utilisez une instance différente de la base de données pour chaque test
-      firestore = FirebaseFirestore.instanceFor(app: secondaryApp);
-     
+      firestore = FirebaseFirestore.instance;
     });
 
     //tearDown() appelée après l'éxecution de chaque test (nettoyer ressources initialisier par setUp())
