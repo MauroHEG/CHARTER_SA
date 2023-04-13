@@ -7,25 +7,21 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 //Test unitaire pour la fonctionnalitée "Inscription" --> [signup_screen.dart]
-void main() async {
+void main() {
+  // Initialisez Firebase
   group('Test de la fonctionnalitée Inscription :', () {
     //variable firestore avec le mot clé "late" pour indiquer que sa valeur sera initialisée ultérieurement
-    FirebaseApp secondaryApp = Firebase.app("secondaryApp");
-
-    late FirebaseFirestore firestore;
+    /*late FirebaseFirestore firestore;
 
     //setUp() appelée avant l'exécution de chaque test (initialiser ressources dont les tests auront besoins)
     setUp(() async {
-
       //Initialisation de la cloud firebase
       WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform
-          );
+          options: DefaultFirebaseOptions.currentPlatform);
 
       // Utilisez une instance différente de la base de données pour chaque test
-      firestore = FirebaseFirestore.instanceFor(app: secondaryApp);
-     
+      firestore = FirebaseFirestore.instance;
     });
 
     //tearDown() appelée après l'éxecution de chaque test (nettoyer ressources initialisier par setUp())
@@ -34,10 +30,17 @@ void main() async {
       await firestore.clearPersistence();
       //terminer la connexion firestore
       await firestore.terminate();
-    });
+    });*/
 
     //Création d'un utilisateur inexistant sur une FakeFirebase (bdd pour les tests)
     test('test inscription nouvel utilisateur', () async {
+      //Initialisation de la cloud firebase
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp();
+
+      // Utilisez une instance différente de la base de données pour chaque test
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
       // Initialiser les entrées de l'utilisateur
       final prenom = 'elvio';
       final nom = 'Dupont';
@@ -45,6 +48,22 @@ void main() async {
       final password = 'mdp123!test';
       final telephone = '0779415789';
       final role = 'user';
+
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      // Utilisateur créé avec succès
+
+      // Enregistrer les autres informations dans Cloud Firestore
+      await FirebaseFirestore.instance
+          .collection('utilisateurs')
+          .doc(userCredential.user!.uid)
+          .set({
+        'prenom': prenom,
+        'nom': nom,
+        'email': email,
+        'telephone': telephone,
+        'role': role
+      });
 
       // Exécuter la fonctionnalité d'inscription
       //final result = await (username, password);
@@ -85,6 +104,8 @@ void main() async {
     });
 
     //Création du même utilisateur (doit générer une erreur)
-    test('utilisateur en double', () {});
+    test('utilisateur en double', () {
+      print("Salut");
+    });
   });
 }
