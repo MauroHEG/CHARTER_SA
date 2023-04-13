@@ -1,7 +1,6 @@
 import 'package:charter_appli_travaux_mro/utils/appStrings.dart';
 import 'package:charter_appli_travaux_mro/view/acceuil_view.dart';
 import 'package:charter_appli_travaux_mro/view/home_screen.dart';
-import 'package:charter_appli_travaux_mro/view/loginPage_view.dart';
 import 'package:charter_appli_travaux_mro/view/login_screen.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_Profil_view.dart';
 import 'package:charter_appli_travaux_mro/view/shared/appBar_view.dart';
@@ -39,6 +38,6 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.green,
           backgroundColor: Color(0xFFD9F5D0),
         ),
-        home: SignUpScreen());
+        home: LoginScreen());
   }
 }

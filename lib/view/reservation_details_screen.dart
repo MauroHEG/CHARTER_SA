@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // Importez le package des icônes Font Awesome
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReservationDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> reservationDetails;
@@ -34,10 +35,13 @@ class ReservationDetailsScreen extends StatelessWidget {
                 icon: FontAwesomeIcons.city,
                 label: 'Ville',
                 value: reservationDetails['nomVille']),
-            _buildDetailItem(
-                icon: FontAwesomeIcons.mapMarkerAlt,
-                label: 'Adresse de l\'hôtel',
-                value: reservationDetails['adresseHotel']),
+            InkWell(
+              onTap: () => _ouvrirMaps(reservationDetails['adresseHotel']),
+              child: _buildDetailItem(
+                  icon: FontAwesomeIcons.mapMarkerAlt,
+                  label: 'Adresse de l\'hôtel',
+                  value: reservationDetails['adresseHotel']),
+            ),
             _buildDetailItem(
                 icon: FontAwesomeIcons.moneyBillAlt,
                 label: 'Prix payé',
@@ -66,6 +70,16 @@ class ReservationDetailsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _ouvrirMaps(String adresse) async {
+    String url = 'https://www.google.com/maps/search/?api=1&query=$adresse';
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Impossible de lancer l\'URL $url';
+    }
   }
 
   Widget _buildDetailItem(
