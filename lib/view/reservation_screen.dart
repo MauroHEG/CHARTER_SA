@@ -2,6 +2,7 @@ import 'package:charter_appli_travaux_mro/models/reservation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:charter_appli_travaux_mro/view/reservation_details_screen.dart';
 
 class ReservationScreen extends StatefulWidget {
   final String userId;
@@ -58,64 +59,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Détails de la réservation'),
-                          content: SingleChildScrollView(
-                            child: ListBody(
-                              children: [
-                                Text(
-                                    'Nom de l\'hôtel : ${reservations[index].nomHotel}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text('Pays : ${reservations[index].nomPays}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text('Ville : ${reservations[index].nomVille}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Adresse de l\'hôtel : ${reservations[index].adresseHotel}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Prix payé : ${reservations[index].prixPaye} €',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Heure de décollage de l\'avion (départ) : ${reservations[index].heureDecollageDepart}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Heure de décollage de l\'avion (arrivée) : ${reservations[index].heureDecollageArrivee}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Localisation de l\'aéroport de départ : ${reservations[index].localisationAeroportDepart}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Localisation de l\'aéroport d\'arrivée : ${reservations[index].localisationAeroportArrivee}',
-                                    style: TextStyle(fontSize: 16)),
-                                SizedBox(height: 8),
-                                Text(
-                                    'Description du voyage : ${reservations[index].descriptionVoyage}',
-                                    style: TextStyle(fontSize: 16)),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: Text('Fermer'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReservationDetailsScreen(
+                          reservationDetails: reservations[index].toMap(),
+                        ),
+                      ),
                     );
                   },
                 ),

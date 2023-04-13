@@ -37,4 +37,19 @@ class Reservation {
       localisationAeroportDepart: map['localisationAeroportDepart'],
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'nomHotel': nomHotel,
+      'nomPays': nomPays,
+      'nomVille': nomVille,
+      'adresseHotel': adresseHotel,
+      'prixPaye': prixPaye,
+      'heureDecollageDepart': heureDecollageDepart,
+      'heureDecollageArrivee': heureDecollageArrivee,
+      'localisationAeroportDepart': localisationAeroportDepart,
+      'localisationAeroportArrivee': localisationAeroportArrivee,
+      'descriptionVoyage': descriptionVoyage,
+    };
+  }
 }
