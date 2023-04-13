@@ -1,6 +1,5 @@
 import 'package:charter_appli_travaux_mro/utils/appStrings.dart';
 import 'package:flutter/material.dart';
-import 'package:charter_appli_travaux_mro/view/loginPage_view.dart';
 
 class AppBar_profil_view extends StatefulWidget {
   const AppBar_profil_view(
