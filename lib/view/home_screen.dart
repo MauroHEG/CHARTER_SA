@@ -105,7 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Mes réservations') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ReservationScreen()),
+              MaterialPageRoute(
+                builder: (context) => ReservationScreen(
+                  userId: FirebaseAuth.instance.currentUser!.uid,
+                ),
+              ),
             );
           }
 
