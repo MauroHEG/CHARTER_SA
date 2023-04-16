@@ -105,11 +105,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Mot de passe'),
+                decoration: InputDecoration(
+                    labelText:
+                        'Mot de passe (laisser vide pour conserver le mot de passe actuel)'),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer un mot de passe';
+                  if (value != null && value.isNotEmpty && value.length < 6) {
+                    return 'Le mot de passe doit comporter au moins 6 caractères';
                   }
                   return null;
                 },
@@ -120,10 +122,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     InputDecoration(labelText: 'Confirmer le mot de passe'),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez confirmer le mot de passe';
-                  }
-                  if (value != _passwordController.text) {
+                  if (_passwordController.text.isNotEmpty &&
+                      value != _passwordController.text) {
                     return 'Les mots de passe ne correspondent pas';
                   }
                   return null;
@@ -133,7 +133,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-// Sauvegarder les modifications du profil dans Firebase
+                    // Sauvegarder les modifications du profil dans Firebase
                     _updateProfile();
                   }
                 },
@@ -147,29 +147,109 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _updateProfile() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-// Mettre à jour les données utilisateur dans Firestore
-      await _firestore.collection('utilisateurs').doc(user.uid).update({
+    try {
+      // Mettre à jour l'adresse e-mail de l'utilisateur dans FirebaseAuth
+      await FirebaseAuth.instance.currentUser!
+          .updateEmail(_emailController.text)
+          .catchError((error) async {
+        if (error.code == 'requires-recent-login') {
+          // Demander à l'utilisateur de se reconnecter
+          bool reauthenticated = await _reauthenticateUser();
+          if (reauthenticated) {
+            // Réessayer de mettre à jour l'email après la reconnexion
+            await FirebaseAuth.instance.currentUser!
+                .updateEmail(_emailController.text);
+          }
+        } else {
+          throw error;
+        }
+      });
+
+      // Mettre à jour les informations de l'utilisateur dans Firestore
+      await FirebaseFirestore.instance
+          .collection('utilisateurs')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({
         'email': _emailController.text,
         'nom': _nomController.text,
         'prenom': _prenomController.text,
         'telephone': _telephoneController.text,
       });
 
-      // Mettre à jour l'adresse e-mail de l'utilisateur dans Firebase Auth
-      await user.updateEmail(_emailController.text);
+      // Mettre à jour le mot de passe de l'utilisateur dans FirebaseAuth si un nouveau mot de passe a été saisi
+      if (_passwordController.text.isNotEmpty) {
+        await FirebaseAuth.instance.currentUser!
+            .updatePassword(_passwordController.text);
+      }
 
-      // Mettre à jour le mot de passe de l'utilisateur dans Firebase Auth
-      await user.updatePassword(_passwordController.text);
-
-      // Affichez un message pour indiquer que les modifications ont été enregistrées
+      // Afficher un message de réussite et revenir à l'écran précédent
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Modifications enregistrées')),
+        SnackBar(content: Text("Profil mis à jour avec succès")),
       );
-
-      // Rediriger vers la page précédente
       Navigator.pop(context);
+    } catch (e) {
+      // Afficher un message d'erreur en cas d'échec de la mise à jour
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur lors de la mise à jour du profil : $e")),
+      );
     }
+  }
+
+  Future<bool> _reauthenticateUser() async {
+    String email = FirebaseAuth.instance.currentUser!.email!;
+    TextEditingController passwordController = TextEditingController();
+    bool result = false;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Reconnexion requise'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                  'Pour mettre à jour votre adresse e-mail, vous devez vous reconnecter. Veuillez entrer votre mot de passe actuel.'),
+              TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(labelText: 'Mot de passe'),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Se reconnecter'),
+              onPressed: () async {
+                try {
+                  // Se reconnecter avec l'email et le mot de passe actuels
+                  AuthCredential credential = EmailAuthProvider.credential(
+                      email: email, password: passwordController.text);
+                  await FirebaseAuth.instance.currentUser!
+                      .reauthenticateWithCredential(credential);
+                  // Fermer la boîte de dialogue
+                  Navigator.of(context).pop();
+                  result = true;
+                } catch (e) {
+                  // Afficher un message d'erreur en cas d'échec de la reconnexion
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text("Erreur lors de la reconnexion : $e")),
+                  );
+                  result = false;
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+    return result;
   }
 }
