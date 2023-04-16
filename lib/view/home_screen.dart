@@ -1,4 +1,5 @@
 import 'package:charter_appli_travaux_mro/view/reservation_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,7 @@ import 'avis_screen.dart';
 import 'documents_screen.dart';
 import 'login_screen.dart';
 import 'offres_charter_screen.dart';
+import 'edit_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String fullName;
@@ -40,8 +42,37 @@ class _HomeScreenState extends State<HomeScreen> {
                       ListTile(
                         leading: Icon(Icons.edit),
                         title: Text('Modifier le profil'),
-                        onTap: () {
-                          // Naviguer vers la page de modification du profil
+                        onTap: () async {
+                          // Stocker le BuildContext actuel
+                          final currentContext = context;
+
+                          // Récupérer les données de l'utilisateur connecté
+                          final user = FirebaseAuth.instance.currentUser;
+                          if (user != null) {
+                            final doc = await FirebaseFirestore.instance
+                                .collection('utilisateurs')
+                                .doc(user.uid)
+                                .get();
+                            final userProfile = doc.data();
+
+                            if (userProfile != null) {
+                              // Naviguer vers la page de modification du profil en utilisant currentContext
+                              Navigator.push(
+                                currentContext,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProfileScreen(
+                                      userProfile: userProfile),
+                                ),
+                              );
+                            } else {
+                              // Afficher un message d'erreur si les données de l'utilisateur ne sont pas disponibles
+                              ScaffoldMessenger.of(currentContext).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        "Erreur lors de la récupération des données de l'utilisateur")),
+                              );
+                            }
+                          }
                         },
                       ),
                       ListTile(
