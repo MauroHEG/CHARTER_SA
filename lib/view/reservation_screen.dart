@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:charter_appli_travaux_mro/view/reservation_details_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReservationScreen extends StatefulWidget {
   final String userId;
@@ -24,6 +25,15 @@ class _ReservationScreenState extends State<ReservationScreen> {
         .doc(widget.userId)
         .collection('reservations')
         .snapshots();
+  }
+
+  void _lancerAppel() async {
+    const url = 'tel:+41227343535';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Impossible de lancer l\'appel. Veuillez réessayer.';
+    }
   }
 
   @override
@@ -48,7 +58,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
               snapshot.data!.docs.map((DocumentSnapshot document) {
             return Reservation.fromMap(document.data() as Map<String, dynamic>);
           }).toList();
-
           return ListView.builder(
             itemCount: reservations.length,
             itemBuilder: (BuildContext context, int index) {
@@ -73,6 +82,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _lancerAppel,
+        child: Icon(Icons.phone),
+        tooltip: 'Contactez-nous',
       ),
     );
   }
