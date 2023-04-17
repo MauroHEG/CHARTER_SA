@@ -5,6 +5,7 @@ import 'package:charter_appli_travaux_mro/web_admin/screens/user_list_page.dart'
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:charter_appli_travaux_mro/web_admin/screens/admin_conversations_screen.dart';
 
 import '../../utils/appStrings.dart';
 
@@ -60,6 +61,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16),
+                ElevatedButton(
+                  child: Text("Conversations avec les clients"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            AdminConversationsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 24),
                 FutureBuilder(
                   future: Future.wait([
                     _getNombreTotalUtilisateurs(),

@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 
 import '../utils/appStrings.dart';
 import 'avis_screen.dart';
+import 'client_chat_button.dart';
 import 'documents_screen.dart';
 import 'login_screen.dart';
 import 'offres_charter_screen.dart';
 import 'edit_profile_screen.dart';
+import 'services/conversation_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final String fullName;
@@ -112,6 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+              SizedBox(height: 20), // Ajouter un espacement entre les boutons
+              ClientChatButton(), // Ajouter le bouton de chat ici
             ],
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_info_provider.dart';
 import '../utils/appStrings.dart';
+import '../web_admin/screens/admin_dashboard_screen.dart';
 import 'home_screen.dart';
 import 'signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -148,14 +149,25 @@ class _LoginScreenState extends State<LoginScreen> {
       // Stockez le rôle dans le UserInfoProvider
       Provider.of<UserInfoProvider>(context, listen: false).setRole(role);
 
-      // Connexion réussie, naviguer vers l'écran d'accueil
-      Navigator.pushReplacement(
+      // Connexion réussie, naviguer vers l'écran d'accueil ou l'écran du tableau de bord administrateur
+      if (role == 'admin') {
+        // Si l'utilisateur est un administrateur, naviguez vers AdminDashboardScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AdminDashboardScreen()),
+        );
+      } else {
+        // Si l'utilisateur est un utilisateur normal, naviguez vers HomeScreen
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => HomeScreen(
-                    avatarPath: '',
-                    fullName: nom,
-                  )));
+            builder: (context) => HomeScreen(
+              avatarPath: '',
+              fullName: nom,
+            ),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print("Aucun utilisateur trouvé pour cet e-mail.");
@@ -174,6 +186,6 @@ class _LoginScreenState extends State<LoginScreen> {
         .doc(userId)
         .get();
     return doc.data()?['role'] ??
-        'role'; // Utilisez la clé correspondant au champ 'role' dans votre base de données
+        'role'; // Utiliser la clé correspondant au champ 'role' dans la base de données
   }
 }
