@@ -77,15 +77,36 @@ class _ChatScreenState extends State<ChatScreen> {
 
                         String senderName =
                             '${snapshot.data!['prenom']} ${snapshot.data!['nom']}';
-                        return Column(
-                          crossAxisAlignment: isClient
-                              ? CrossAxisAlignment.start
-                              : CrossAxisAlignment.end,
-                          children: [
-                            Text(senderName,
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text(message.content),
-                          ],
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12.0, vertical: 6.0),
+                          child: Column(
+                            crossAxisAlignment: isClient
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Text(senderName,
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              Material(
+                                borderRadius: BorderRadius.circular(12.0),
+                                color: isClient
+                                    ? Colors.blueAccent
+                                    : Colors.grey[300],
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 15.0),
+                                  child: Text(
+                                    message.content,
+                                    style: TextStyle(
+                                        color: isClient
+                                            ? Colors.white
+                                            : Colors.black),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     );
@@ -103,6 +124,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     controller: _messageController,
                     decoration: InputDecoration(
                       hintText: 'Écrire un message...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
                     ),
                   ),
                 ),
