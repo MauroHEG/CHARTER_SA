@@ -1,13 +1,18 @@
 import 'package:charter_appli_travaux_mro/view/services/chat_service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/messages.dart';
 
 class ChatScreen extends StatefulWidget {
   final String conversationId;
+  final String adminId;
+  final String clientId;
 
-  ChatScreen({required this.conversationId});
+  ChatScreen(
+      {required this.conversationId,
+      required this.adminId,
+      required this.clientId});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -15,6 +20,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final ChatService _chatService = ChatService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _messageController = TextEditingController();
 
   @override
@@ -44,7 +50,45 @@ class _ChatScreenState extends State<ChatScreen> {
                 return ListView.builder(
                   itemCount: messages.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return Text(messages[index].content);
+                    final message = messages[index];
+                    final isClient = message.senderId == widget.clientId;
+                    final senderNameFuture = isClient
+                        ? _firestore
+                            .collection('utilisateurs')
+                            .doc(widget.clientId)
+                            .get()
+                        : _firestore
+                            .collection('utilisateurs')
+                            .doc(widget.adminId)
+                            .get();
+
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: senderNameFuture,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Erreur : ${snapshot.error}');
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        String senderName =
+                            '${snapshot.data!['prenom']} ${snapshot.data!['nom']}';
+                        return Column(
+                          crossAxisAlignment: isClient
+                              ? CrossAxisAlignment.start
+                              : CrossAxisAlignment.end,
+                          children: [
+                            Text(senderName,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(message.content),
+                          ],
+                        );
+                      },
+                    );
                   },
                 );
               },
@@ -68,12 +112,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (_messageController.text.isNotEmpty) {
                       _chatService.sendMessage(
                         Message(
-                          senderId:
-                              'SENDER_ID', // Remplacer par l'ID de l'utilisateur/administrateur actuel
-                          senderType:
-                              'SENDER_TYPE', // Remplacer par "client" ou "admin" selon le côté
-                          recipientId:
-                              'RECIPIENT_ID', // Remplacer par l'ID de l'administrateur ou du client avec qui on discute
+                          senderId: widget.adminId,
+                          senderType: 'admin',
+                          recipientId: widget.clientId,
                           content: _messageController.text,
                           timestamp: DateTime.now(),
                         ),

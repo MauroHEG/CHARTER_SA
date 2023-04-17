@@ -12,6 +12,7 @@ class ClientChatButton extends StatefulWidget {
 
 class _ClientChatButtonState extends State<ClientChatButton> {
   final ConversationService _conversationService = ConversationService();
+  final String adminId = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +36,11 @@ class _ClientChatButtonState extends State<ClientChatButton> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  ChatScreen(conversationId: conversationId),
+              builder: (BuildContext context) => ChatScreen(
+                conversationId: conversationId,
+                adminId: adminId,
+                clientId: clientId,
+              ),
             ),
           );
         } else {

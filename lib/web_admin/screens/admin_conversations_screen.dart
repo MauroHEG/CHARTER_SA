@@ -66,8 +66,12 @@ class _AdminConversationsScreenState extends State<AdminConversationsScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            ChatScreen(conversationId: conversationId),
+                        builder: (BuildContext context) => ChatScreen(
+                          conversationId: conversationId,
+                          adminId: adminId,
+                          clientId:
+                              clientId, // Vous devez déterminer l'ID du client ici
+                        ),
                       ),
                     );
                   },
