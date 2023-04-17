@@ -11,10 +11,10 @@ void main() {
   // Initialisez Firebase
   group('Test de la fonctionnalitée Inscription :', () {
     //variable firestore avec le mot clé "late" pour indiquer que sa valeur sera initialisée ultérieurement
-    /*late FirebaseFirestore firestore;
+    late FirebaseFirestore firestore;
 
     //setUp() appelée avant l'exécution de chaque test (initialiser ressources dont les tests auront besoins)
-    setUp(() async {
+    /*setUp(() async {
       //Initialisation de la cloud firebase
       WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
@@ -36,10 +36,11 @@ void main() {
     test('test inscription nouvel utilisateur', () async {
       //Initialisation de la cloud firebase
       WidgetsFlutterBinding.ensureInitialized();
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
 
       // Utilisez une instance différente de la base de données pour chaque test
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      firestore = FirebaseFirestore.instance;
 
       // Initialiser les entrées de l'utilisateur
       final prenom = 'elvio';
@@ -49,6 +50,7 @@ void main() {
       final telephone = '0779415789';
       final role = 'user';
 
+      // Exécuter la fonctionnalité d'inscription
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       // Utilisateur créé avec succès
@@ -65,15 +67,15 @@ void main() {
         'role': role
       });
 
-      // Exécuter la fonctionnalité d'inscription
-      //final result = await (username, password);
-
       // Vérifier que l'inscription s'est bien déroulée
       //expect(result, true);
 
       // Vérifier que l'utilisateur a été ajouté à la base de données
-      //final user = await firestore.collection('users').doc(username).get();
-      //expect(user.exists, true);
+      final user = await firestore
+          .collection('utilisateurs')
+          .doc(userCredential.user!.uid)
+          .get();
+      expect(user.exists, true);
 
       //------------------------------------------------------------------------------------------->
       // Vérifier que l'utilisateur a été enregistré dans Firestore
@@ -105,7 +107,7 @@ void main() {
 
     //Création du même utilisateur (doit générer une erreur)
     test('utilisateur en double', () {
-      print("Salut");
+      print("Test");
     });
   });
 }
