@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 
 class ContenuDossierScreen extends StatefulWidget {
   final String dossierId;
@@ -16,72 +16,91 @@ class ContenuDossierScreen extends StatefulWidget {
 }
 
 class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.dossierNom),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton.icon(
-              onPressed: () async {
-                bool permissionAccordee = await _demandePermissionStockage();
-                if (permissionAccordee) {
-                  FilePickerResult? result = await FilePicker.platform
-                      .pickFiles(
-                          type: FileType.custom, allowedExtensions: ['pdf']);
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore
+            .collection('utilisateurs')
+            .doc(userId)
+            .collection('dossiers')
+            .doc(widget.dossierId)
+            .collection('fichiers')
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Erreur : ${snapshot.error}');
+          }
 
-                  if (result != null) {
-                    File file = File(result.files.single.path!);
-                    await uploadPdf(file);
-                  }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          'La permission de lecture du stockage externe est refusée')));
-                }
-              },
-              icon: Icon(Icons.add),
-              label: Text('Ajouter un PDF'),
-            ),
-          ],
-        ),
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          }
+
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (BuildContext context, int index) {
+              DocumentSnapshot fichierSnapshot = snapshot.data!.docs[index];
+              return ListTile(
+                leading: Icon(Icons.picture_as_pdf),
+                title: Text(fichierSnapshot.get('nom')),
+                onTap: () {
+                  // Vous pouvez ajouter ici une action pour ouvrir le fichier PDF avec un package approprié
+                },
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _ajouterFichier,
       ),
     );
   }
 
-  Future<bool> _demandePermissionStockage() async {
-    PermissionStatus status = await Permission.storage.status;
-    if (status.isDenied) {
-      PermissionStatus nouvellePermission = await Permission.storage.request();
-      if (nouvellePermission.isGranted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (status.isGranted) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  void _ajouterFichier() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
 
-  Future<void> uploadPdf(File file) async {
-    try {
-      String fileName = file.path.split('/').last;
-      Reference reference = FirebaseStorage.instance
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      String fileName = result.files.single.name;
+
+      // Téléchargez le fichier dans Firebase Storage
+      TaskSnapshot taskSnapshot = await _storage
           .ref()
-          .child('utilisateurs/${widget.dossierId}/$fileName');
-      UploadTask uploadTask = reference.putFile(file);
-      await uploadTask.whenComplete(() => null);
+          .child('utilisateurs/$userId/dossiers/${widget.dossierId}/$fileName')
+          .putFile(file);
+
+      // Ajoutez le fichier à la collection de fichiers du dossier
+      String fileUrl = await taskSnapshot.ref.getDownloadURL();
+      await _firestore
+          .collection('utilisateurs')
+          .doc(userId)
+          .collection('dossiers')
+          .doc(widget.dossierId)
+          .collection('fichiers')
+          .add({
+        'nom': fileName,
+        'url': fileUrl,
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fichier PDF ajouté avec succès')));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Erreur lors de l'ajout du fichier PDF : $e")));
+        SnackBar(content: Text('Fichier ajouté avec succès')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Aucun fichier sélectionné")),
+      );
     }
   }
 }
