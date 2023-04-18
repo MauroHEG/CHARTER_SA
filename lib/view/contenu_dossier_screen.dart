@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 
 class ContenuDossierScreen extends StatefulWidget {
   final String dossierId;
@@ -112,30 +114,65 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
 
     if (result != null) {
       File file = File(result.files.single.path!);
+      Uint8List fileBytes = await file.readAsBytes();
       String fileName = result.files.single.name;
 
-      // Téléchargez le fichier dans Firebase Storage
-      TaskSnapshot taskSnapshot = await _storage
-          .ref()
-          .child('utilisateurs/$userId/dossiers/${widget.dossierId}/$fileName')
-          .putFile(file);
+      try {
+        // Vérifiez si le fichier existe déjà dans Firebase Storage
+        await _storage
+            .ref()
+            .child(
+                'utilisateurs/$userId/dossiers/${widget.dossierId}/fichiers/$fileName')
+            .getMetadata();
 
-      // Ajoutez le fichier à la collection de fichiers du dossier
-      String fileUrl = await taskSnapshot.ref.getDownloadURL();
-      await _firestore
-          .collection('utilisateurs')
-          .doc(userId)
-          .collection('dossiers')
-          .doc(widget.dossierId)
-          .collection('fichiers')
-          .add({
-        'nom': fileName,
-        'url': fileUrl,
-      });
+        // Si le fichier existe, affichez un message d'erreur
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Le fichier existe déjà")),
+        );
+      } catch (e) {
+        if (e is FirebaseException && e.code == 'object-not-found') {
+          // Si le fichier n'existe pas, procédez au téléchargement
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fichier ajouté avec succès')),
-      );
+          // Téléchargez le fichier dans Firebase Storage
+          StreamSubscription<TaskSnapshot> subscription = _storage
+              .ref()
+              .child(
+                  'utilisateurs/$userId/dossiers/${widget.dossierId}/fichiers/$fileName')
+              .putData(fileBytes)
+              .snapshotEvents
+              .listen(
+            (TaskSnapshot snapshot) {
+              print('État du téléchargement : ${snapshot.state}');
+            },
+            onError: (Object error, StackTrace stackTrace) {
+              print('Erreur lors du téléchargement : $error');
+            },
+          );
+
+          // Attendez la fin du téléchargement
+          TaskSnapshot taskSnapshot = await subscription.asFuture();
+
+          // Ajoutez le fichier à la collection de fichiers du dossier
+          String fileUrl = await taskSnapshot.ref.getDownloadURL();
+          await _firestore
+              .collection('utilisateurs')
+              .doc(userId)
+              .collection('dossiers')
+              .doc(widget.dossierId)
+              .collection('fichiers')
+              .add({
+            'nom': fileName,
+            'url': fileUrl,
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Fichier ajouté avec succès')),
+          );
+        } else {
+          // Gérez les autres erreurs
+          print('Erreur inattendue : $e');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Aucun fichier sélectionné")),
