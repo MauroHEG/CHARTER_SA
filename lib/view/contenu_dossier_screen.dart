@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class ContenuDossierScreen extends StatefulWidget {
   final String dossierId;
@@ -50,8 +53,44 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
               return ListTile(
                 leading: Icon(Icons.picture_as_pdf),
                 title: Text(fichierSnapshot.get('nom')),
-                onTap: () {
-                  // Vous pouvez ajouter ici une action pour ouvrir le fichier PDF avec un package approprié
+                onTap: () async {
+                  String? url = fichierSnapshot.get('url');
+                  String? nom = fichierSnapshot.get('nom');
+                  if (url != null && nom != null) {
+                    // Téléchargez le fichier PDF et stockez-le dans le cache de l'application
+                    var response = await http.get(Uri.parse(url));
+                    var tempDir = await getTemporaryDirectory();
+                    File tempFile = File('${tempDir.path}/$nom');
+                    await tempFile.writeAsBytes(response.bodyBytes);
+
+                    // Ouvrez le fichier PDF dans une nouvelle page avec le widget PDFView
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: AppBar(title: Text(nom)),
+                          body: PDFView(
+                            filePath: tempFile.path,
+                            autoSpacing: true,
+                            enableSwipe: true,
+                            swipeHorizontal: true,
+                            onError: (error) {
+                              print(error);
+                            },
+                            onPageError: (page, error) {
+                              print('$page: ${error.toString()}');
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text("Erreur lors de l'ouverture du fichier")),
+                    );
+                  }
                 },
               );
             },
