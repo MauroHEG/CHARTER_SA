@@ -1,11 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:universal_io/io.dart';
+import 'dart:html' as html;
 
 class PageFormulaireOffre extends StatefulWidget {
   @override
@@ -169,15 +172,29 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   }
 
   Future<void> _selectionnerPdf() async {
-    FilePickerResult? resultat = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-    if (resultat != null) {
-      setState(() {
-        _octetsPdfSelectionne = resultat.files.single.bytes;
-        _nomPdfSelectionne = resultat.files.single.name;
-      });
+    if (kIsWeb) {
+      FilePickerResult? resultat = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+      if (resultat != null) {
+        setState(() {
+          _octetsPdfSelectionne = resultat.files.single.bytes;
+          _nomPdfSelectionne = resultat.files.single.name;
+        });
+      }
+    } else {
+      FilePickerResult? resultat = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+      if (resultat != null && resultat.files.single.path != null) {
+        File file = File(resultat.files.single.path!);
+        setState(() {
+          _pdfSelectionne = file;
+          _nomPdfSelectionne = resultat.files.single.name;
+        });
+      }
     }
   }
 
@@ -187,7 +204,7 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
       _urlsImagesTelechargees = [];
       for (XFile image in _imagesSelectionnees!) {
         String nomFichier =
-            'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+            'images/${DateTime.now().millisecondsSinceEpoch}${image.name}';
         Reference ref = stockage.ref().child(nomFichier);
         await ref.putFile(File(image.path));
         String urlTelechargement = await ref.getDownloadURL();

@@ -58,7 +58,7 @@ class _OffresListPageState extends State<OffresListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OffreFormPage(),
+              builder: (context) => PageFormulaireOffre(),
             ),
           );
         },
