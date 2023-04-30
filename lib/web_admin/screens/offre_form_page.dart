@@ -3,12 +3,11 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:universal_io/io.dart';
-import 'dart:html' as html;
+import 'package:universal_io/io.dart';
 
 class PageFormulaireOffre extends StatefulWidget {
   @override
@@ -43,104 +42,143 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
       appBar: AppBar(
         title: Text('Créer une offre'),
       ),
-      body: Form(
-        key: _cleFormulaire,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _controleurTitre,
-                decoration: InputDecoration(labelText: 'Titre'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer un titre';
-                  }
-                  return null;
-                },
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _cleFormulaire,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  Text(
+                    'Informations sur l\'offre',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: _controleurTitre,
+                    decoration: InputDecoration(labelText: 'Titre'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer un titre';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _controleurPrix,
+                    decoration: InputDecoration(labelText: 'Prix'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer un prix';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _controleurDescription,
+                    decoration: InputDecoration(labelText: 'Description'),
+                    maxLines: 5,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer une description';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Dates',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          DateTime? dateSelectionnee = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(Duration(days: 365)),
+                          );
+                          if (dateSelectionnee != null) {
+                            setState(() {
+                              _dateDebut = dateSelectionnee;
+                            });
+                          }
+                        },
+                        child: Text(_dateDebut == null
+                            ? 'Date de début'
+                            : 'Date de début: ${_dateDebut!.day}/${_dateDebut!.month}/${_dateDebut!.year}'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          DateTime? dateSelectionnee = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(Duration(days: 365)),
+                          );
+                          if (dateSelectionnee != null) {
+                            setState(() {
+                              _dateFin = dateSelectionnee;
+                            });
+                          }
+                        },
+                        child: Text(_dateFin == null
+                            ? 'Date de fin'
+                            : 'Date de fin: ${_dateFin!.day}/${_dateFin!.month}/${_dateFin!.year}'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Fichiers',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _selectionnerImages,
+                        child: Text('Images'),
+                      ),
+                      ElevatedButton(
+                        onPressed: _selectionnerPdf,
+                        child: Text('PDF'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  if (_nomPdfSelectionne != null)
+                    Text(
+                      'Fichier sélectionné: $_nomPdfSelectionne',
+                      style:
+                          TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                    ),
+                  SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_cleFormulaire.currentState!.validate() &&
+                            _dateDebut != null &&
+                            _dateFin != null) {
+                          _creerOffre();
+                        }
+                      },
+                      child: Text('Créer une offre'),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
-              TextFormField(
-                controller: _controleurPrix,
-                decoration: InputDecoration(labelText: 'Prix'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer un prix';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _controleurDescription,
-                decoration: InputDecoration(labelText: 'Description'),
-                maxLines: 5,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer une description';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? dateSelectionnee = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
-                  );
-                  if (dateSelectionnee != null) {
-                    setState(() {
-                      _dateDebut = dateSelectionnee;
-                    });
-                  }
-                },
-                child: Text(_dateDebut == null
-                    ? 'Sélectionner la date de début'
-                    : 'Date de début: ${_dateDebut!.day}/${_dateDebut!.month}/${_dateDebut!.year}'),
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? dateSelectionnee = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
-                  );
-                  if (dateSelectionnee != null) {
-                    setState(() {
-                      _dateFin = dateSelectionnee;
-                    });
-                  }
-                },
-                child: Text(_dateFin == null
-                    ? 'Sélectionner la date de fin'
-                    : 'Date de fin: ${_dateFin!.day}/${_dateFin!.month}/${_dateFin!.year}'),
-              ),
-              ElevatedButton(
-                onPressed: _selectionnerImages,
-                child: Text('Sélectionner des images'),
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _selectionnerPdf,
-                child: Text('Sélectionner un PDF'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_cleFormulaire.currentState!.validate() &&
-                      _dateDebut != null &&
-                      _dateFin != null) {
-                    _creerOffre();
-                  }
-                },
-                child: Text('Créer une offre'),
-              ),
-              SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
@@ -172,29 +210,15 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   }
 
   Future<void> _selectionnerPdf() async {
-    if (kIsWeb) {
-      FilePickerResult? resultat = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-      if (resultat != null) {
-        setState(() {
-          _octetsPdfSelectionne = resultat.files.single.bytes;
-          _nomPdfSelectionne = resultat.files.single.name;
-        });
-      }
-    } else {
-      FilePickerResult? resultat = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-      if (resultat != null && resultat.files.single.path != null) {
-        File file = File(resultat.files.single.path!);
-        setState(() {
-          _pdfSelectionne = file;
-          _nomPdfSelectionne = resultat.files.single.name;
-        });
-      }
+    FilePickerResult? resultat = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (resultat != null) {
+      setState(() {
+        _octetsPdfSelectionne = resultat.files.single.bytes;
+        _nomPdfSelectionne = resultat.files.single.name;
+      });
     }
   }
 
