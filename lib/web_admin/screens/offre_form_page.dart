@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:universal_io/io.dart';
 import 'dart:html' as html;
+
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 
 class PageFormulaireOffre extends StatefulWidget {
   @override
@@ -212,14 +216,15 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
 
   Future<void> _selectionnerPdf() async {
     if (kIsWeb) {
-      FilePickerResult? resultat = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-      if (resultat != null) {
-        setState(() {
-          _octetsPdfSelectionne = resultat.files.single.bytes;
-          _nomPdfSelectionne = resultat.files.single.name;
+      html.File? htmlFile = await _pickWebFile();
+      if (htmlFile != null) {
+        final reader = html.FileReader();
+        reader.readAsArrayBuffer(htmlFile);
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            _octetsPdfSelectionne = reader.result as Uint8List?;
+            _nomPdfSelectionne = htmlFile.name;
+          });
         });
       }
     } else {
@@ -235,6 +240,34 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
         });
       }
     }
+  }
+
+  Future<html.File?> _pickWebFile() async {
+    final completer = Completer<html.File>();
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.multiple = false;
+    uploadInput.accept = '.pdf';
+
+    uploadInput.onChange.listen((e) async {
+      final files = uploadInput.files;
+      if (files != null && files.length == 1) {
+        final file = files[0];
+        final reader = html.FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            _octetsPdfSelectionne = reader.result as Uint8List?;
+            _nomPdfSelectionne = file.name;
+          });
+        });
+        completer.complete(file);
+      } else {
+        completer.complete(null);
+      }
+    });
+
+    uploadInput.click();
+    return completer.future;
   }
 
   Future<void> _televerserFichiers() async {
