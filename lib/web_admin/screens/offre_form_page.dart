@@ -12,8 +12,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:universal_io/io.dart';
 import 'dart:html' as html;
 
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:mime_type/mime_type.dart';
 
@@ -30,13 +28,11 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   DateTime? _dateDebut;
   DateTime? _dateFin;
   List<XFile>? _imagesSelectionnees;
-  File? _pdfSelectionne;
   List<String>? _urlsImagesTelechargees;
   String? _urlPdfTelecharge;
   Uint8List? _octetsPdfSelectionne;
   String? _nomPdfSelectionne;
   List<html.File>? _imagesSelectionneesHtml;
-  List<Uint8List>? _imagesSelectionneesBytes;
 
   @override
   void dispose() {
@@ -178,30 +174,76 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 10),
-                        for (int index = 0;
-                            index <
-                                (kIsWeb
-                                    ? _imagesSelectionneesHtml!.length
-                                    : _imagesSelectionnees!.length);
-                            index++)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text(
-                              kIsWeb
-                                  ? _imagesSelectionneesHtml![index].name
-                                  : _imagesSelectionnees![index].name,
-                              style: TextStyle(
-                                  fontSize: 16, fontStyle: FontStyle.italic),
+                        if (_imagesSelectionnees != null)
+                          for (int index = 0;
+                              index < _imagesSelectionnees!.length;
+                              index++)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _imagesSelectionnees![index].name,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      setState(() {
+                                        _imagesSelectionnees!.removeAt(index);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                        if (_imagesSelectionneesHtml != null)
+                          for (int index = 0;
+                              index < _imagesSelectionneesHtml!.length;
+                              index++)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _imagesSelectionneesHtml![index].name,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      setState(() {
+                                        _imagesSelectionneesHtml!
+                                            .removeAt(index);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                         if (_nomPdfSelectionne != null)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text(
-                              'Fichier sélectionné: $_nomPdfSelectionne',
-                              style: TextStyle(
-                                  fontSize: 16, fontStyle: FontStyle.italic),
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                'PDF sélectionné: $_nomPdfSelectionne',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _octetsPdfSelectionne = null;
+                                    _nomPdfSelectionne = null;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                       ],
                     ),
