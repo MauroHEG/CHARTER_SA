@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/_internal/file_picker_web.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -13,6 +14,8 @@ import 'dart:html' as html;
 
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'package:mime_type/mime_type.dart';
 
 class PageFormulaireOffre extends StatefulWidget {
   @override
@@ -32,6 +35,7 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   String? _urlPdfTelecharge;
   Uint8List? _octetsPdfSelectionne;
   String? _nomPdfSelectionne;
+  List<html.File>? _imagesSelectionneesHtml;
 
   @override
   void dispose() {
@@ -161,6 +165,48 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                     ],
                   ),
                   SizedBox(height: 10),
+                  if (_imagesSelectionnees != null)
+                    Container(
+                      height: 200,
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: _imagesSelectionnees!.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey, width: 1),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    child: Image.memory(
+                                      _imagesSelectionnees![index] as Uint8List,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Image ${index + 1}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  SizedBox(height: 10),
                   if (_nomPdfSelectionne != null)
                     Text(
                       'Fichier sélectionné: $_nomPdfSelectionne',
@@ -207,60 +253,33 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   }
 
   Future<void> _selectionnerImages() async {
-    final ImagePicker _choixImage = ImagePicker();
-    List<XFile>? images = await _choixImage.pickMultiImage();
-    setState(() {
-      _imagesSelectionnees = images;
-    });
-  }
-
-  Future<void> _selectionnerPdf() async {
     if (kIsWeb) {
-      html.File? htmlFile = await _pickWebFile();
-      if (htmlFile != null) {
-        final reader = html.FileReader();
-        reader.readAsArrayBuffer(htmlFile);
-        reader.onLoadEnd.listen((event) {
-          setState(() {
-            _octetsPdfSelectionne = reader.result as Uint8List?;
-            _nomPdfSelectionne = htmlFile.name;
-          });
+      List<html.File>? imageFiles = await ImagePickerWeb.getMultiImagesAsFile();
+      if (imageFiles != null) {
+        setState(() {
+          _imagesSelectionneesHtml = imageFiles;
         });
       }
     } else {
-      FilePickerResult? resultat = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-      if (resultat != null && resultat.files.single.path != null) {
-        File file = File(resultat.files.single.path!);
-        setState(() {
-          _pdfSelectionne = file;
-          _nomPdfSelectionne = resultat.files.single.name;
-        });
-      }
+      final ImagePicker _choixImage = ImagePicker();
+      List<XFile>? images = await _choixImage.pickMultiImage();
+      setState(() {
+        _imagesSelectionnees = images;
+      });
     }
   }
 
-  Future<html.File?> _pickWebFile() async {
-    final completer = Completer<html.File>();
-    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
-    uploadInput.multiple = false;
-    uploadInput.accept = '.pdf';
+  Future<List<html.File>?> _pickMultiWebFiles() async {
+    final completer = Completer<List<html.File>>();
+    html.InputElement uploadInput = html.InputElement(type: 'file');
+    uploadInput.multiple = true;
+    uploadInput.accept =
+        'image/jpeg, image/png, image/gif, image/webp, image/svg+xml, image/bmp, image/tiff, image/x-icon';
 
-    uploadInput.onChange.listen((e) async {
+    uploadInput.onChange.listen((e) {
       final files = uploadInput.files;
-      if (files != null && files.length == 1) {
-        final file = files[0];
-        final reader = html.FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onLoadEnd.listen((event) {
-          setState(() {
-            _octetsPdfSelectionne = reader.result as Uint8List?;
-            _nomPdfSelectionne = file.name;
-          });
-        });
-        completer.complete(file);
+      if (files != null && files.length > 0) {
+        completer.complete(files);
       } else {
         completer.complete(null);
       }
@@ -270,17 +289,44 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
     return completer.future;
   }
 
+  Future<void> _selectionnerPdf() async {
+    FilePickerResult? resultat = await FilePickerWeb.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (resultat != null) {
+      Uint8List fichier = resultat.files.single.bytes!;
+      String nomFichier = resultat.files.single.name;
+      setState(() {
+        _octetsPdfSelectionne = fichier;
+        _nomPdfSelectionne = nomFichier;
+      });
+    }
+  }
+
   Future<void> _televerserFichiers() async {
     FirebaseStorage stockage = FirebaseStorage.instance;
-    if (_imagesSelectionnees != null) {
+    if (_imagesSelectionnees != null || _imagesSelectionneesHtml != null) {
       _urlsImagesTelechargees = [];
-      for (XFile image in _imagesSelectionnees!) {
-        String nomFichier =
-            'images/${DateTime.now().millisecondsSinceEpoch}${image.name}';
-        Reference ref = stockage.ref().child(nomFichier);
-        await ref.putFile(File(image.path));
-        String urlTelechargement = await ref.getDownloadURL();
-        _urlsImagesTelechargees!.add(urlTelechargement);
+      if (kIsWeb) {
+        for (html.File image in _imagesSelectionneesHtml!) {
+          String nomFichier =
+              'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+          Reference ref = stockage.ref().child(nomFichier);
+          String mimeType = mime(image.name)!;
+          await ref.putBlob(image, SettableMetadata(contentType: mimeType));
+          String urlTelechargement = await ref.getDownloadURL();
+          _urlsImagesTelechargees!.add(urlTelechargement);
+        }
+      } else {
+        for (XFile image in _imagesSelectionnees!) {
+          String nomFichier =
+              'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+          Reference ref = stockage.ref().child(nomFichier);
+          await ref.putFile(File(image.path));
+          String urlTelechargement = await ref.getDownloadURL();
+          _urlsImagesTelechargees!.add(urlTelechargement);
+        }
       }
     }
 
