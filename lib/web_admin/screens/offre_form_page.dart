@@ -36,6 +36,7 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   Uint8List? _octetsPdfSelectionne;
   String? _nomPdfSelectionne;
   List<html.File>? _imagesSelectionneesHtml;
+  List<Uint8List>? _imagesSelectionneesBytes;
 
   @override
   void dispose() {
@@ -165,7 +166,8 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                     ],
                   ),
                   SizedBox(height: 10),
-                  if (_imagesSelectionnees != null)
+                  if (_imagesSelectionnees != null ||
+                      _imagesSelectionneesHtml != null)
                     Container(
                       height: 200,
                       child: GridView.builder(
@@ -174,7 +176,9 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
                         ),
-                        itemCount: _imagesSelectionnees!.length,
+                        itemCount: kIsWeb
+                            ? _imagesSelectionneesHtml!.length
+                            : _imagesSelectionnees!.length,
                         itemBuilder: (context, index) {
                           return Container(
                             decoration: BoxDecoration(
@@ -187,11 +191,24 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Expanded(
-                                    child: Image.memory(
-                                      _imagesSelectionnees![index] as Uint8List,
-                                      fit: BoxFit.cover,
-                                    ),
+                                  FutureBuilder<Uint8List>(
+                                    future: _convertirFichierHtmlEnUint8List(
+                                        _imagesSelectionneesHtml![index]),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<Uint8List> snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator(); // Affiche un indicateur de chargement pendant la conversion
+                                      } else if (snapshot.hasError) {
+                                        return Text(
+                                            "Erreur lors de la conversion du fichier en Uint8List : ${snapshot.error}");
+                                      } else {
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          fit: BoxFit.cover,
+                                        );
+                                      }
+                                    },
                                   ),
                                   Text(
                                     'Image ${index + 1}',
@@ -252,21 +269,54 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
     }
   }
 
+  Future<List<Uint8List>?> convertXFilesToUint8List(List<XFile>? xfiles) async {
+    if (xfiles == null) return null;
+    List<Uint8List> byteDataList = [];
+    for (XFile xfile in xfiles) {
+      Uint8List byteData = await File(xfile.path).readAsBytes();
+      byteDataList.add(byteData);
+    }
+    return byteDataList;
+  }
+
   Future<void> _selectionnerImages() async {
     if (kIsWeb) {
       List<html.File>? imageFiles = await ImagePickerWeb.getMultiImagesAsFile();
       if (imageFiles != null) {
         setState(() {
-          _imagesSelectionneesHtml = imageFiles;
+          if (_imagesSelectionneesHtml == null) {
+            _imagesSelectionneesHtml = imageFiles;
+          } else {
+            _imagesSelectionneesHtml!.addAll(imageFiles);
+          }
         });
       }
     } else {
       final ImagePicker _choixImage = ImagePicker();
       List<XFile>? images = await _choixImage.pickMultiImage();
       setState(() {
-        _imagesSelectionnees = images;
+        if (_imagesSelectionnees == null) {
+          _imagesSelectionnees = images;
+        } else {
+          _imagesSelectionnees!.addAll(images!);
+        }
       });
     }
+  }
+
+  Future<Uint8List> _convertirFichierHtmlEnUint8List(html.File fichier) async {
+    final completer = Completer<Uint8List>();
+    final reader = html.FileReader();
+
+    reader.onLoadEnd.listen((event) {
+      completer.complete(reader.result as Uint8List);
+    });
+    reader.onError.listen((event) {
+      completer.completeError(event);
+    });
+    reader.readAsArrayBuffer(fichier);
+
+    return completer.future;
   }
 
   Future<List<html.File>?> _pickMultiWebFiles() async {
