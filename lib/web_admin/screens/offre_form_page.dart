@@ -33,6 +33,8 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   Uint8List? _octetsPdfSelectionne;
   String? _nomPdfSelectionne;
   List<html.File>? _imagesSelectionneesHtml;
+  String? _pays;
+  String? _ville;
 
   @override
   void dispose() {
@@ -46,26 +48,33 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Créer une offre'),
+        title: const Text('Créer une offre'),
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SingleChildScrollView(
             child: Form(
               key: _cleFormulaire,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     'Informations sur l\'offre',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Titre',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                   TextFormField(
                     controller: _controleurTitre,
-                    decoration: InputDecoration(labelText: 'Titre'),
+                    decoration: const InputDecoration(
+                      labelText: 'Entrez le titre',
+                      border: OutlineInputBorder(),
+                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez entrer un titre';
@@ -73,9 +82,49 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Pays',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Entrez le nom du pays',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _pays = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Ville',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Entrez le nom de la ville',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _ville = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Prix',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                   TextFormField(
                     controller: _controleurPrix,
-                    decoration: InputDecoration(labelText: 'Prix'),
+                    decoration: const InputDecoration(
+                      labelText: 'Entrez le prix',
+                      border: OutlineInputBorder(),
+                    ),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -84,9 +133,17 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Description',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                   TextFormField(
                     controller: _controleurDescription,
-                    decoration: InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(
+                      labelText: 'Entrez la description',
+                      border: OutlineInputBorder(),
+                    ),
                     maxLines: 5,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -95,12 +152,12 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     'Dates',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -110,7 +167,8 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                             context: context,
                             initialDate: DateTime.now(),
                             firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(Duration(days: 365)),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
                           );
                           if (dateSelectionnee != null) {
                             setState(() {
@@ -128,7 +186,8 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                             context: context,
                             initialDate: DateTime.now(),
                             firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(Duration(days: 365)),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
                           );
                           if (dateSelectionnee != null) {
                             setState(() {
@@ -142,38 +201,38 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     'Fichiers',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ElevatedButton(
                         onPressed: _selectionnerImages,
-                        child: Text('Images'),
+                        child: const Text('Images'),
                       ),
                       ElevatedButton(
                         onPressed: _selectionnerPdf,
-                        child: Text('PDF'),
+                        child: const Text('PDF'),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   if (_imagesSelectionnees != null ||
                       _imagesSelectionneesHtml != null ||
                       _nomPdfSelectionne != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Fichiers sélectionnés',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         if (_imagesSelectionnees != null)
                           for (int index = 0;
                               index < _imagesSelectionnees!.length;
@@ -185,12 +244,12 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                                 children: [
                                   Text(
                                     _imagesSelectionnees![index].name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 16,
                                         fontStyle: FontStyle.italic),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete),
+                                    icon: const Icon(Icons.delete),
                                     onPressed: () {
                                       setState(() {
                                         _imagesSelectionnees!.removeAt(index);
@@ -211,12 +270,12 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                                 children: [
                                   Text(
                                     _imagesSelectionneesHtml![index].name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 16,
                                         fontStyle: FontStyle.italic),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete),
+                                    icon: const Icon(Icons.delete),
                                     onPressed: () {
                                       setState(() {
                                         _imagesSelectionneesHtml!
@@ -232,10 +291,10 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                             children: [
                               Text(
                                 'PDF sélectionné: $_nomPdfSelectionne',
-                                style: TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 16),
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete),
+                                icon: const Icon(Icons.delete),
                                 onPressed: () {
                                   setState(() {
                                     _octetsPdfSelectionne = null;
@@ -247,7 +306,7 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                           ),
                       ],
                     ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -257,10 +316,10 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                           _creerOffre();
                         }
                       },
-                      child: Text('Créer une offre'),
+                      child: const Text('Créer une offre'),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -277,6 +336,8 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
         'titre': _controleurTitre.text,
         'prix': double.parse(_controleurPrix.text),
         'description': _controleurDescription.text,
+        'pays': _pays,
+        'ville': _ville,
         'images': _urlsImagesTelechargees,
         'pdf': _urlPdfTelecharge,
       });
