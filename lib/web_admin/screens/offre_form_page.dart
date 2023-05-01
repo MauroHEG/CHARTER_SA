@@ -167,68 +167,43 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
                   ),
                   SizedBox(height: 10),
                   if (_imagesSelectionnees != null ||
-                      _imagesSelectionneesHtml != null)
-                    Container(
-                      height: 200,
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+                      _imagesSelectionneesHtml != null ||
+                      _nomPdfSelectionne != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Fichiers sélectionnés',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        itemCount: kIsWeb
-                            ? _imagesSelectionneesHtml!.length
-                            : _imagesSelectionnees!.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey, width: 1),
+                        SizedBox(height: 10),
+                        for (int index = 0;
+                            index <
+                                (kIsWeb
+                                    ? _imagesSelectionneesHtml!.length
+                                    : _imagesSelectionnees!.length);
+                            index++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              kIsWeb
+                                  ? _imagesSelectionneesHtml![index].name
+                                  : _imagesSelectionnees![index].name,
+                              style: TextStyle(
+                                  fontSize: 16, fontStyle: FontStyle.italic),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  FutureBuilder<Uint8List>(
-                                    future: _convertirFichierHtmlEnUint8List(
-                                        _imagesSelectionneesHtml![index]),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<Uint8List> snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return CircularProgressIndicator(); // Affiche un indicateur de chargement pendant la conversion
-                                      } else if (snapshot.hasError) {
-                                        return Text(
-                                            "Erreur lors de la conversion du fichier en Uint8List : ${snapshot.error}");
-                                      } else {
-                                        return Image.memory(
-                                          snapshot.data!,
-                                          fit: BoxFit.cover,
-                                        );
-                                      }
-                                    },
-                                  ),
-                                  Text(
-                                    'Image ${index + 1}',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontStyle: FontStyle.italic),
-                                  ),
-                                ],
-                              ),
+                          ),
+                        if (_nomPdfSelectionne != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              'Fichier sélectionné: $_nomPdfSelectionne',
+                              style: TextStyle(
+                                  fontSize: 16, fontStyle: FontStyle.italic),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  SizedBox(height: 10),
-                  if (_nomPdfSelectionne != null)
-                    Text(
-                      'Fichier sélectionné: $_nomPdfSelectionne',
-                      style:
-                          TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                          ),
+                      ],
                     ),
                   SizedBox(height: 20),
                   Center(
