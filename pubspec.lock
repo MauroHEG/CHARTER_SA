@@ -428,10 +428,10 @@ packages:
     dependency: "direct main"
     description:
       name: image_picker_web
-      sha256: "1185be1cf3cf2ccd99be3f2fd451647147fe512f09db0aad894438ab95a984eb"
+      sha256: "2792196db19157d9af2903310ad99d42270841b872c51977b984d06e63bdb3ce"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0+1"
+    version: "2.1.1"
   intl:
     dependency: transitive
     description:
@@ -505,21 +505,13 @@ packages:
     source: hosted
     version: "1.9.1"
   mime:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mime
       sha256: e4ff8e8564c03f255408decd16e7899da1733852a9110a58fe6d1b817684a63e
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  mime_type:
-    dependency: "direct main"
-    description:
-      name: mime_type
-      sha256: "2ad6e67d3d2de9ac0f8ef5352d998fd103cb21351ae8c02fb0c78b079b37d275"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   mock_exceptions:
     dependency: transitive
     description:
