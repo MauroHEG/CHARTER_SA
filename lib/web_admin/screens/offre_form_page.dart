@@ -336,10 +336,10 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
         'titre': _controleurTitre.text,
         'prix': double.parse(_controleurPrix.text),
         'description': _controleurDescription.text,
-        'pays': _pays,
-        'ville': _ville,
         'images': _urlsImagesTelechargees,
         'pdf': _urlPdfTelecharge,
+        'dateDebut': _dateDebut!.toUtc(),
+        'dateFin': _dateFin!.toUtc(),
       });
       Navigator.pop(context);
     } catch (e) {
