@@ -27,8 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text(widget.fullName, style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title:
+            Text(widget.fullName, style: const TextStyle(color: Colors.black)),
         actions: [
           IconButton(
             icon: CircleAvatar(
@@ -42,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       ListTile(
-                        leading: Icon(Icons.edit),
-                        title: Text('Modifier le profil'),
+                        leading: const Icon(Icons.edit),
+                        title: const Text('Modifier le profil'),
                         onTap: () async {
                           // Stocker le BuildContext actuel
                           final currentContext = context;
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             } else {
                               // Afficher un message d'erreur si les données de l'utilisateur ne sont pas disponibles
                               ScaffoldMessenger.of(currentContext).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text(
                                         "Erreur lors de la récupération des données de l'utilisateur")),
                               );
@@ -78,8 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text('Se déconnecter'),
+                        leading: const Icon(Icons.logout),
+                        title: const Text('Se déconnecter'),
                         onTap: () {
                           // Déconnexion et redirection vers la page de connexion
                           _deconnexionEtRedirection();
@@ -95,13 +96,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Image(
+              const Image(
                 image: AssetImage(AppStrings.cheminLogo),
               ),
-              SizedBox(height: 80),
+              const SizedBox(height: 80),
               AspectRatio(
                 aspectRatio: 1, // Ajuster le rapport hauteur/largeur ici
                 child: GridView.count(
@@ -114,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20), // Ajouter un espacement entre les boutons
+              const SizedBox(
+                  height: 20), // Ajouter un espacement entre les boutons
               ClientChatButton(), // Ajouter le bouton de chat ici
             ],
           ),
@@ -125,8 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomeButton(String text, IconData icon) {
     return Card(
-      color: Color(0xFF7BF853),
-      margin: EdgeInsets.all(8),
+      color: const Color(0xFF7BF853),
+      margin: const EdgeInsets.all(8),
       child: InkWell(
         onTap: () {
           // Naviguation vers l'écran approprié en fonction du bouton cliqué
@@ -167,7 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 64, color: Colors.black),
-              Text(text, style: TextStyle(color: Colors.black, fontSize: 18)),
+              Text(text,
+                  style: const TextStyle(color: Colors.black, fontSize: 18)),
             ],
           ),
         ),
