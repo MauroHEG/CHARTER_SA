@@ -66,7 +66,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1019852036603',
     projectId: 'charter-bd51b',
     storageBucket: 'charter-bd51b.appspot.com',
-    iosClientId: '1019852036603-7a6jj8vafq0f9d844du6ms97btrq1t1s.apps.googleusercontent.com',
+    iosClientId:
+        '1019852036603-7a6jj8vafq0f9d844du6ms97btrq1t1s.apps.googleusercontent.com',
     iosBundleId: 'com.example.charterAppliTravauxMro',
   );
 
@@ -76,7 +77,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1019852036603',
     projectId: 'charter-bd51b',
     storageBucket: 'charter-bd51b.appspot.com',
-    iosClientId: '1019852036603-7a6jj8vafq0f9d844du6ms97btrq1t1s.apps.googleusercontent.com',
+    iosClientId:
+        '1019852036603-7a6jj8vafq0f9d844du6ms97btrq1t1s.apps.googleusercontent.com',
     iosBundleId: 'com.example.charterAppliTravauxMro',
   );
 }

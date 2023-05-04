@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFD9F5D0),
+          color: Colors.white,
         ),
         child: Center(
           child: SingleChildScrollView(
@@ -71,9 +71,8 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: InputDecoration(labelText: 'Mot de passe'),
       obscureText: true,
       validator: (String? value) {
-        if (value!.isEmpty) return 'Le mot de passe est obligatoire.';
-        if (value.length < 6)
-          return 'Le mot de passe doit contenir au moins 6 caractères.';
+        if (value!.isEmpty) return 'Veuillez renseigner votre mot de passe.';
+
         return null;
       },
       onSaved: (String? value) => _password = value!,
@@ -99,6 +98,9 @@ class _LoginScreenState extends State<LoginScreen> {
             minimumSize: Size(200, 60), // Modifiez la taille du bouton ici
             padding: EdgeInsets.symmetric(
                 horizontal: 20), // Modifiez le padding ici si nécessaire
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30), // Définir le rayon ici
+            ),
           ),
           child: Text('Connexion',
               style: TextStyle(
@@ -118,6 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
             minimumSize: Size(200, 60), // Modifiez la taille du bouton ici
             padding: EdgeInsets.symmetric(
                 horizontal: 20), // Modifiez le padding ici si nécessaire
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30), // Définir le rayon ici
+            ),
           ),
           child: Text("S'inscrire",
               style: TextStyle(
@@ -169,11 +174,18 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print("Aucun utilisateur trouvé pour cet e-mail.");
-      } else if (e.code == 'wrong-password') {
-        print("Le mot de passe est incorrect.");
-      }
+      String messageErreur;
+
+      messageErreur =
+          "L'email ou le mot de passe sont incorrets. Veuillez réessayer";
+
+      // Afficher le message d'erreur avec un SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(messageErreur),
+          backgroundColor: Colors.red,
+        ),
+      );
     } catch (e) {
       print(e);
     }

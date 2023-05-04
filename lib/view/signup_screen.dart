@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../utils/appStrings.dart';
 import 'login_screen.dart';
 
@@ -34,7 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFD9F5D0),
+          color: Colors.white,
         ),
         child: Center(
           child: SingleChildScrollView(
@@ -176,14 +175,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildSignUpButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          primary: Color(0xFF7BF853), minimumSize: Size(200, 60)),
+          primary: Color(0xFF7BF853),
+          minimumSize: Size(200, 60),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15)),
       child: Text("S'inscrire", style: TextStyle(fontSize: 20)),
       onPressed: () {
-        /*if (_formKey.currentState == null || !_formKey.currentState!.validate())
-          return;
-        _formKey.currentState?.save();*/
-
-        // Traiter les données saisie dans le formulaire ici
         if (!_formKey.currentState!.validate()) return;
         _formKey.currentState?.save();
         _enregistrerUtilisateur();
