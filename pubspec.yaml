@@ -59,6 +59,7 @@ dependencies:
   mime_type: ^1.0.0
   path: ^1.8.1
   flutter_neumorphic: ^3.0.3
+  firebase_messaging: ^14.4.0
 
 dev_dependencies:
   flutter_test:

@@ -10,16 +10,39 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:charter_appli_travaux_mro/providers/user_info_provider.dart';
+import 'package:charter_appli_travaux_mro/providers/notification_provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
-  //initialisation de la Firebase
+  // Initialisation de Firebase
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions
-          .currentPlatform); //currentPlatform --> va trouver et utiliser les infos firebase propre à chaque OS (android, iOS, web...)
+          .currentPlatform); // currentPlatform --> va trouver et utiliser les infos firebase propre à chaque OS (android, iOS, web...)
+
+  // Initialisation de Firebase Messaging
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Demander l'autorisation de recevoir des notifications
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    // Si l'autorisation est accordée, écouter les messages entrants
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("Message reçu: ${message.notification?.body}");
+    });
+  }
+
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserInfoProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserInfoProvider()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -32,11 +55,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Mon application',
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-          backgroundColor: Color(0xFFD9F5D0),
-        ),
-        home: LoginScreen());
+      title: 'Mon application',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        backgroundColor: Color(0xFFD9F5D0),
+      ),
+      home: LoginScreen(),
+    );
   }
 }
