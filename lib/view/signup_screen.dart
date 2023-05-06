@@ -8,6 +8,9 @@ import 'login_screen.dart';
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
+
+  void enregistrerUtilisateur(String e, String p, String f, String l, String t) {}
+
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -184,12 +187,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       onPressed: () {
         if (!_formKey.currentState!.validate()) return;
         _formKey.currentState?.save();
-        _enregistrerUtilisateur();
+        enregistrerUtilisateur(_email!,  _password!,  _firstName!,  _lastName!,  _phoneNumber!);
       },
     );
   }
 
-  Future<void> _enregistrerUtilisateur() async {
+
+
+  Future<void> enregistrerUtilisateur(String _email, String _password, String _firstName, String _lastName, String _phoneNumber) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: _email!, password: _password!);
