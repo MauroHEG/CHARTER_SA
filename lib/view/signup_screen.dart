@@ -4,17 +4,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/appStrings.dart';
 import 'login_screen.dart';
+import 'services/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 
-  void enregistrerUtilisateur(String e, String p, String f, String l, String t) {}
-
+  void enregistrerUtilisateur(
+      String e, String p, String f, String l, String t) {}
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
   String? _firstName,
       _lastName,
       _email,
@@ -184,48 +186,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15)),
       child: Text("S'inscrire", style: TextStyle(fontSize: 20)),
-      onPressed: () {
+      onPressed: () async {
         if (!_formKey.currentState!.validate()) return;
         _formKey.currentState?.save();
-        enregistrerUtilisateur(_email!,  _password!,  _firstName!,  _lastName!,  _phoneNumber!);
+        try {
+          await _authService.enregistrerUtilisateur(
+              _email!, _password!, _firstName!, _lastName!, _phoneNumber!);
+
+          // Naviguer vers l'écran de connexion ou l'écran d'accueil
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        } catch (e) {
+          print(e);
+        }
       },
     );
-  }
-
-
-
-  Future<void> enregistrerUtilisateur(String _email, String _password, String _firstName, String _lastName, String _phoneNumber) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: _email!, password: _password!);
-      // Utilisateur créé avec succès
-
-      // Enregistrer les autres informations dans Cloud Firestore
-      await FirebaseFirestore.instance
-          .collection('utilisateurs')
-          .doc(userCredential.user!.uid)
-          .set({
-        'prenom': _firstName,
-        'nom': _lastName,
-        'email': _email,
-        'telephone': _phoneNumber,
-        'role': 'user'
-      });
-
-      // Naviguer vers l'écran de connexion ou l'écran d'accueil
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-    } on FirebaseAuthException catch (e) {
-      // Gérer les erreurs d'inscription
-      if (e.code == 'weak-password') {
-        print('Le mot de passe est trop faible.');
-      } else if (e.code == 'email-already-in-use') {
-        print('Le compte existe déjà pour cet e-mail.');
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 }

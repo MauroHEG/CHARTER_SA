@@ -1,3 +1,4 @@
+import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_info_provider.dart';
@@ -16,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String _email, _password;
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
             _formKey.currentState?.save();
-            // Process the entered data here
-            _seConnecter();
+            _authService.seConnecter(
+                context, _email, _password); // Modifiez cette ligne
           },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF7BF853),
@@ -131,73 +133,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
-  }
-
-  Future<String> _recupererNom(String userId) async {
-    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-        .collection('utilisateurs')
-        .doc(userId)
-        .get();
-    return documentSnapshot.get('nom');
-  }
-
-  Future<void> _seConnecter() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: _email, password: _password);
-      String userId = userCredential.user!.uid;
-      String nom = await _recupererNom(userId);
-
-      // Récupérez le rôle de l'utilisateur
-      String role = await _recupererRole(userId);
-
-      // Stockez le rôle dans le UserInfoProvider
-      Provider.of<UserInfoProvider>(context, listen: false).setRole(role);
-
-      // Connexion réussie, naviguer vers l'écran d'accueil ou l'écran du tableau de bord administrateur
-      if (role == 'admin') {
-        // Si l'utilisateur est un administrateur, naviguez vers AdminDashboardScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => AdminDashboardScreen()),
-        );
-      } else {
-        // Si l'utilisateur est un utilisateur normal, naviguez vers HomeScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              avatarPath: '',
-              fullName: nom,
-            ),
-          ),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      String messageErreur;
-
-      messageErreur =
-          "L'email ou le mot de passe sont incorrets. Veuillez réessayer";
-
-      // Afficher le message d'erreur avec un SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(messageErreur),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<String> _recupererRole(String userId) async {
-    DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore
-        .instance
-        .collection('utilisateurs')
-        .doc(userId)
-        .get();
-    return doc.data()?['role'] ??
-        'role'; // Utiliser la clé correspondant au champ 'role' dans la base de données
   }
 }
