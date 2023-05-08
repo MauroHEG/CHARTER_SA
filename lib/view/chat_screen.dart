@@ -10,8 +10,8 @@ class ChatScreen extends StatefulWidget {
   final String adminId;
   final String clientId;
 
-  ChatScreen(
-      {required this.conversationId,
+  const ChatScreen(
+      {super.key, required this.conversationId,
       required this.adminId,
       required this.clientId});
 
@@ -29,7 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+        title: const Text('Chat'),
       ),
       body: SafeArea(
         child: Column(
@@ -45,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   }
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
 
                   List<Message> messages = snapshot.data!;
@@ -62,7 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ConnectionState.done) {
                             bool isAdmin = message.senderType == "admin";
                             return Container(
-                              margin: EdgeInsets.symmetric(
+                              margin: const EdgeInsets.symmetric(
                                   vertical: 8.0, horizontal: 12.0),
                               child: Column(
                                 crossAxisAlignment: isAdmin
@@ -71,7 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 children: [
                                   Text(
                                     snapshot.data!,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                     ),
@@ -83,14 +83,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? Colors.blue.shade100
                                           : Colors.green.shade100,
                                     ),
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                       vertical: 8.0,
                                       horizontal: 12.0,
                                     ),
-                                    margin: EdgeInsets.only(top: 4.0),
+                                    margin: const EdgeInsets.only(top: 4.0),
                                     child: Text(
                                       message.content,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                       ),
                                     ),
@@ -99,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             );
                           } else {
-                            return CircularProgressIndicator();
+                            return const CircularProgressIndicator();
                           }
                         },
                       );
@@ -109,7 +109,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Row(
                 children: [
                   Expanded(
@@ -124,7 +124,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send),
+                    icon: const Icon(Icons.send),
                     onPressed: () async {
                       if (_messageController.text.isNotEmpty) {
                         String currentUserId =

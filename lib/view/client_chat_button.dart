@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'chat_screen.dart';
 
 class ClientChatButton extends StatefulWidget {
+  const ClientChatButton({super.key});
+
   @override
   _ClientChatButtonState createState() => _ClientChatButtonState();
 }
@@ -92,29 +94,29 @@ class _ClientChatButtonState extends State<ClientChatButton> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text("Aucun administrateur trouvé"),
                 ),
               );
             }
           },
           style: ElevatedButton.styleFrom(
-            primary: unreadCount > 0
+            backgroundColor: unreadCount > 0
                 ? Colors.orange
-                : Color(
+                : const Color(
                     0xFF7BF853), // Couleur du bouton lorsqu'il n'y a pas de messages non lus
             shape: RoundedRectangleBorder(
               borderRadius:
                   BorderRadius.circular(30), // Rayon de la bordure arrondie
             ),
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
                 horizontal: 30, vertical: 15), // Padding du bouton
-            textStyle: TextStyle(fontSize: 18), // Taille du texte
+            textStyle: const TextStyle(fontSize: 18), // Taille du texte
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Discuter avec un administrateur',
                 style: TextStyle(color: Colors.black),
               ),
@@ -126,7 +128,7 @@ class _ClientChatButtonState extends State<ClientChatButton> {
                     backgroundColor: Colors.red,
                     child: Text(
                       '$unreadCount',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 ),

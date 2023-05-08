@@ -1,8 +1,10 @@
 import 'package:charter_appli_travaux_mro/view/ville_details_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart'; // Ajoutez ce paquet pour utiliser le carrousel d'images
+// Ajoutez ce paquet pour utiliser le carrousel d'images
 
 class OffresCharterScreen extends StatefulWidget {
+  const OffresCharterScreen({super.key});
+
   @override
   _OffresCharterScreenState createState() => _OffresCharterScreenState();
 }
@@ -27,8 +29,8 @@ class _OffresCharterScreenState extends State<OffresCharterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text("Offres Charter", style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text("Offres Charter", style: TextStyle(color: Colors.black)),
       ),
       body: ListView.builder(
         itemCount: paysList

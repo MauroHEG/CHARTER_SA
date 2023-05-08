@@ -1,4 +1,3 @@
-import 'package:charter_appli_travaux_mro/utils/appStrings.dart';
 import 'package:flutter/material.dart';
 
 class AppBar_view extends StatefulWidget {

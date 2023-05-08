@@ -6,20 +6,20 @@ import 'package:url_launcher/url_launcher.dart';
 class ReservationDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> reservationDetails;
 
-  ReservationDetailsScreen({required this.reservationDetails});
+  const ReservationDetailsScreen({super.key, required this.reservationDetails});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text(
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text(
           'Détails de la réservation',
           style: TextStyle(color: Colors.black),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -85,16 +85,16 @@ class ReservationDetailsScreen extends StatelessWidget {
   Widget _buildDetailItem(
       {required IconData icon, required String label, required String value}) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
         leading: FaIcon(icon, size: 24),
         title: Text(
           label,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           value,
-          style: TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16),
         ),
       ),
     );

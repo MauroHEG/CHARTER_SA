@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class UserListPage extends StatefulWidget {
+  const UserListPage({super.key});
+
   @override
   _UserListPageState createState() => _UserListPageState();
 }
@@ -19,17 +21,17 @@ class _UserListPageState extends State<UserListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des utilisateurs'),
+        title: const Text('Liste des utilisateurs'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: users.snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text("Une erreur s'est produite");
+            return const Text("Une erreur s'est produite");
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
 
           return ListView(
@@ -38,13 +40,13 @@ class _UserListPageState extends State<UserListPage> {
                   document.data() as Map<String, dynamic>;
               return Card(
                 child: ListTile(
-                  leading: CircleAvatar(
+                  leading: const CircleAvatar(
                     child: Icon(Icons.person),
                   ),
                   title: Text(data['nom'] ?? 'Pas de nom'),
                   subtitle: Text(data['email'] ?? 'Pas d\'email'),
                   trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
+                    icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
                       supprimerUtilisateur(document.id);
                     },

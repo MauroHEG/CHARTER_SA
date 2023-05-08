@@ -1,5 +1,4 @@
 import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
@@ -18,11 +17,11 @@ void main() {
 
     test("Un utilisateur doit être ajouté à Firebase", () async {
       // Les données pour l'inscription
-      final email = 'test@test.com';
-      final password = 'motdepasse';
-      final firstName = 'Jean';
-      final lastName = 'Dupont';
-      final phoneNumber = '0123456789';
+      const email = 'test@test.com';
+      const password = 'motdepasse';
+      const firstName = 'Jean';
+      const lastName = 'Dupont';
+      const phoneNumber = '0123456789';
 
       await authService.enregistrerUtilisateur(
           email, password, firstName, lastName, phoneNumber);

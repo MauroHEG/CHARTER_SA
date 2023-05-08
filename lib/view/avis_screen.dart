@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/avis.dart';
 
 class AvisScreen extends StatefulWidget {
+  const AvisScreen({super.key});
+
   @override
   _AvisScreenState createState() => _AvisScreenState();
 }
@@ -26,8 +28,8 @@ class _AvisScreenState extends State<AvisScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text("Avis", style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text("Avis", style: TextStyle(color: Colors.black)),
       ),
       body: ListView.builder(
         itemCount: avisList.length,
@@ -41,34 +43,34 @@ class _AvisScreenState extends State<AvisScreen> {
 
   Widget _buildAvis(BuildContext context, Avis avis) {
     return Card(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               avis.titre, // Titre de l'avis
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Écrit par ${avis.utilisateur}', // Nom de l'utilisateur qui a écrit l'avis
-              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               avis.description, // Description de l'avis
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 24),
-                SizedBox(width: 4),
+                const Icon(Icons.star, color: Colors.amber, size: 24),
+                const SizedBox(width: 4),
                 Text(
                   avis.note.toString(), // Note de l'avis (ex: 4.5)
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

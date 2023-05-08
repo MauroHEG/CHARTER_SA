@@ -5,23 +5,25 @@ import 'contenu_dossier_screen.dart';
 import 'services/firestore_service.dart';
 
 class DocumentsScreen extends StatefulWidget {
+  const DocumentsScreen({super.key});
+
   @override
   _DocumentsScreenState createState() => _DocumentsScreenState();
 }
 
 class _DocumentsScreenState extends State<DocumentsScreen> {
-  FirestoreService _firestoreService = FirestoreService();
+  final FirestoreService _firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text('Mes documents', style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text('Mes documents', style: TextStyle(color: Colors.black)),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: Color(0xFFD9F5D0),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        color: const Color(0xFFD9F5D0),
         child: StreamBuilder<QuerySnapshot>(
           stream: _firestoreService.getDossiers(),
           builder:
@@ -30,7 +32,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               return Center(child: Text('Erreur: ${snapshot.error}'));
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             return ListView.builder(
               itemCount: snapshot.data!.docs.length,
@@ -44,9 +46,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFF7BF853),
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFF7BF853),
         onPressed: _ajouterDossier,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -56,16 +58,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     String dossierId = dossier.id;
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        leading: Icon(
+        leading: const Icon(
           Icons.folder,
           color: Colors.green,
           size: 36.0,
         ),
         title: Text(
           nomDossier,
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
         onTap: () {
           Navigator.push(
@@ -90,20 +92,20 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Nouveau dossier'),
+          title: const Text('Nouveau dossier'),
           content: TextField(
             controller: dossierController,
-            decoration: InputDecoration(labelText: 'Nom du dossier'),
+            decoration: const InputDecoration(labelText: 'Nom du dossier'),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Annuler'),
+              child: const Text('Annuler'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Créer'),
+              child: const Text('Créer'),
               onPressed: () async {
                 String userId = FirebaseAuth.instance.currentUser!.uid;
                 await FirebaseFirestore.instance

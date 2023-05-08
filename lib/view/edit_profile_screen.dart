@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile;
 
-  EditProfileScreen({required this.userProfile});
+  const EditProfileScreen({super.key, required this.userProfile});
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -53,17 +53,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Modifier le profil'),
+        title: const Text('Modifier le profil'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -74,7 +74,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               TextFormField(
                 controller: _nomController,
-                decoration: InputDecoration(labelText: 'Nom'),
+                decoration: const InputDecoration(labelText: 'Nom'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez entrer un nom';
@@ -84,7 +84,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               TextFormField(
                 controller: _prenomController,
-                decoration: InputDecoration(labelText: 'Prénom'),
+                decoration: const InputDecoration(labelText: 'Prénom'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez entrer un prénom';
@@ -94,7 +94,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               TextFormField(
                 controller: _telephoneController,
-                decoration: InputDecoration(labelText: 'Téléphone'),
+                decoration: const InputDecoration(labelText: 'Téléphone'),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -105,7 +105,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     labelText:
                         'Mot de passe (laisser vide pour conserver le mot de passe actuel)'),
                 obscureText: true,
@@ -119,7 +119,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextFormField(
                 controller: _confirmPasswordController,
                 decoration:
-                    InputDecoration(labelText: 'Confirmer le mot de passe'),
+                    const InputDecoration(labelText: 'Confirmer le mot de passe'),
                 obscureText: true,
                 validator: (value) {
                   if (_passwordController.text.isNotEmpty &&
@@ -129,7 +129,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -137,7 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _updateProfile();
                   }
                 },
-                child: Text('Enregistrer les modifications'),
+                child: const Text('Enregistrer les modifications'),
               ),
             ],
           ),
@@ -184,7 +184,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // Afficher un message de réussite et revenir à l'écran précédent
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Profil mis à jour avec succès")),
+        const SnackBar(content: Text("Profil mis à jour avec succès")),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -204,28 +204,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Reconnexion requise'),
+          title: const Text('Reconnexion requise'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                   'Pour mettre à jour votre adresse e-mail, vous devez vous reconnecter. Veuillez entrer votre mot de passe actuel.'),
               TextFormField(
                 controller: passwordController,
-                decoration: InputDecoration(labelText: 'Mot de passe'),
+                decoration: const InputDecoration(labelText: 'Mot de passe'),
                 obscureText: true,
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Annuler'),
+              child: const Text('Annuler'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Se reconnecter'),
+              child: const Text('Se reconnecter'),
               onPressed: () async {
                 try {
                   // Se reconnecter avec l'email et le mot de passe actuels

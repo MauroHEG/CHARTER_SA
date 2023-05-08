@@ -1,15 +1,11 @@
 import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/user_info_provider.dart';
 import '../utils/appStrings.dart';
-import '../web_admin/screens/admin_dashboard_screen.dart';
-import 'home_screen.dart';
 import 'signup_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -23,24 +19,24 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text('Connexion', style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text('Connexion', style: TextStyle(color: Colors.black)),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
         ),
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  Image(
+                  const Image(
                     image: AssetImage(AppStrings.cheminLogo),
                   ),
-                  SizedBox(
+                  const SizedBox(
                       height:
                           80), // Ajoutez cette ligne pour ajouter de l'espace en dessous de l'image
                   _buildEmailField(),
@@ -57,11 +53,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildEmailField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Email'),
+      decoration: const InputDecoration(labelText: 'Email'),
       validator: (String? value) {
         if (value!.isEmpty) return "L'email est obligatoire.";
-        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value))
+        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
           return 'Entrez un email valide.';
+        }
         return null;
       },
       onSaved: (String? value) => _email = value!,
@@ -70,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildPasswordField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Mot de passe'),
+      decoration: const InputDecoration(labelText: 'Mot de passe'),
       obscureText: true,
       validator: (String? value) {
         if (value!.isEmpty) return 'Veuillez renseigner votre mot de passe.';
@@ -85,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(
+        const SizedBox(
             height:
                 80), // Ajoutez cette ligne pour ajouter de l'espace au-dessus du bouton de connexion
         ElevatedButton(
@@ -96,37 +93,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 context, _email, _password); // Modifiez cette ligne
           },
           style: ElevatedButton.styleFrom(
-            primary: Color(0xFF7BF853),
-            minimumSize: Size(200, 60), // Modifiez la taille du bouton ici
-            padding: EdgeInsets.symmetric(
+            backgroundColor: const Color(0xFF7BF853),
+            minimumSize: const Size(200, 60), // Modifiez la taille du bouton ici
+            padding: const EdgeInsets.symmetric(
                 horizontal: 20), // Modifiez le padding ici si nécessaire
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30), // Définir le rayon ici
             ),
           ),
-          child: Text('Connexion',
+          child: const Text('Connexion',
               style: TextStyle(
                   fontSize:
                       20)), // Modifiez la taille du texte ici si nécessaire
         ),
-        SizedBox(height: 30), // Modifiez la hauteur si nécessaire
+        const SizedBox(height: 30), // Modifiez la hauteur si nécessaire
         ElevatedButton(
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SignUpScreen()),
+              MaterialPageRoute(builder: (context) => const SignUpScreen()),
             );
           },
           style: ElevatedButton.styleFrom(
-            primary: Color(0xFF7BF853),
-            minimumSize: Size(200, 60), // Modifiez la taille du bouton ici
-            padding: EdgeInsets.symmetric(
+            backgroundColor: const Color(0xFF7BF853),
+            minimumSize: const Size(200, 60), // Modifiez la taille du bouton ici
+            padding: const EdgeInsets.symmetric(
                 horizontal: 20), // Modifiez le padding ici si nécessaire
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30), // Définir le rayon ici
             ),
           ),
-          child: Text("S'inscrire",
+          child: const Text("S'inscrire",
               style: TextStyle(
                   fontSize:
                       20)), // Modifiez la taille du texte ici si nécessaire

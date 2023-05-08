@@ -1,12 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/appStrings.dart';
 import 'login_screen.dart';
 import 'services/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 
@@ -29,28 +28,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text('Inscription', style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text('Inscription', style: TextStyle(color: Colors.black)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
         ),
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  Image(
+                  const Image(
                     image: AssetImage(AppStrings.cheminLogo),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   _buildFirstNameField(),
                   _buildLastNameField(),
                   _buildEmailField(),
@@ -58,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   _buildConfirmPasswordField(),
                   _buildPhoneNumberField(),
                   //_buildDateOfBirthField(),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   _buildSignUpButton(),
                 ],
               ),
@@ -71,7 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildFirstNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Prénom'),
+      decoration: const InputDecoration(labelText: 'Prénom'),
       validator: (String? value) {
         if (value!.isEmpty) return 'Le prénom est obligatoire.';
         return null;
@@ -82,7 +81,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildLastNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Nom'),
+      decoration: const InputDecoration(labelText: 'Nom'),
       validator: (String? value) {
         if (value!.isEmpty) return 'Le nom est obligatoire.';
         return null;
@@ -93,11 +92,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildEmailField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Email'),
+      decoration: const InputDecoration(labelText: 'Email'),
       validator: (String? value) {
         if (value!.isEmpty) return 'L\'email est obligatoire.';
-        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value))
+        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
           return 'Entrez un email valide.';
+        }
         return null;
       },
       onSaved: (String? value) => _email = value,
@@ -106,12 +106,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildPasswordField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Mot de passe'),
+      decoration: const InputDecoration(labelText: 'Mot de passe'),
       obscureText: true,
       validator: (String? value) {
         if (value!.isEmpty) return 'Le mot de passe est obligatoire.';
-        if (value.length < 6)
+        if (value.length < 6) {
           return 'Le mot de passe doit contenir au moins 6 caractères.';
+        }
         return null;
       },
       onSaved: (String? value) => _password = value,
@@ -120,13 +121,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildConfirmPasswordField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Confirmer le mot de passe'),
+      decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
       obscureText: true,
       validator: (String? value) {
-        if (value!.isEmpty)
+        if (value!.isEmpty) {
           return 'La confirmation du mot de passe est obligatoire.';
-        if (_password != null && value != _password)
+        }
+        if (_password != null && value != _password) {
           return 'Les mots de passe ne correspondent pas.';
+        }
         return null;
       },
       onSaved: (String? value) => _confirmPassword = value!,
@@ -135,7 +138,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildPhoneNumberField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Téléphone'),
+      decoration: const InputDecoration(labelText: 'Téléphone'),
       keyboardType: TextInputType.phone,
       validator: (String? value) {
         if (value!.isEmpty) return 'Le numéro de téléphone est obligatoire.';
@@ -180,12 +183,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildSignUpButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          primary: Color(0xFF7BF853),
-          minimumSize: Size(200, 60),
+          backgroundColor: const Color(0xFF7BF853),
+          minimumSize: const Size(200, 60),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15)),
-      child: Text("S'inscrire", style: TextStyle(fontSize: 20)),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15)),
+      child: const Text("S'inscrire", style: TextStyle(fontSize: 20)),
       onPressed: () async {
         if (!_formKey.currentState!.validate()) return;
         _formKey.currentState?.save();
@@ -196,7 +199,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           // Naviguer vers l'écran de connexion ou l'écran d'accueil
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
           );
         } catch (e) {
           print(e);

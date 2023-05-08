@@ -1,4 +1,3 @@
-import 'package:charter_appli_travaux_mro/view/services/conversation_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../view/chat_screen.dart';
 
 class AdminConversationsScreen extends StatefulWidget {
+  const AdminConversationsScreen({super.key});
+
   @override
   _AdminConversationsScreenState createState() =>
       _AdminConversationsScreenState();
@@ -19,7 +20,7 @@ class _AdminConversationsScreenState extends State<AdminConversationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Conversations"),
+        title: const Text("Conversations"),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
@@ -32,7 +33,7 @@ class _AdminConversationsScreenState extends State<AdminConversationsScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           return ListView(
@@ -53,7 +54,7 @@ class _AdminConversationsScreenState extends State<AdminConversationsScreen> {
                     }
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text("Chargement...");
+                      return const Text("Chargement...");
                     }
 
                     return Text(
@@ -61,7 +62,7 @@ class _AdminConversationsScreenState extends State<AdminConversationsScreen> {
                   },
                 ),
                 trailing: IconButton(
-                  icon: Icon(Icons.chat),
+                  icon: const Icon(Icons.chat),
                   onPressed: () {
                     Navigator.push(
                       context,

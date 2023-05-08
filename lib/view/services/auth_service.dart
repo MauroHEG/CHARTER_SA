@@ -15,21 +15,21 @@ class AuthService {
       : _auth = auth ?? FirebaseAuth.instance,
         _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Future<void> enregistrerUtilisateur(String _email, String _password,
-      String _firstName, String _lastName, String _phoneNumber) async {
+  Future<void> enregistrerUtilisateur(String email, String password,
+      String firstName, String lastName, String phoneNumber) async {
     try {
       UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: _email, password: _password);
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       // Enregistrer les autres informations dans Cloud Firestore
       await _firestore
           .collection('utilisateurs')
           .doc(userCredential.user!.uid)
           .set({
-        'prenom': _firstName,
-        'nom': _lastName,
-        'email': _email,
-        'telephone': _phoneNumber,
+        'prenom': firstName,
+        'nom': lastName,
+        'email': email,
+        'telephone': phoneNumber,
         'role': 'user'
       });
     } on FirebaseAuthException catch (e) {
@@ -39,7 +39,7 @@ class AuthService {
         throw Exception('Le compte existe déjà pour cet e-mail.');
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -62,7 +62,7 @@ class AuthService {
         // Si l'utilisateur est un administrateur, naviguez vers AdminDashboardScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AdminDashboardScreen()),
+          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
         );
       } else {
         // Si l'utilisateur est un utilisateur normal, naviguez vers HomeScreen
@@ -76,7 +76,7 @@ class AuthService {
           ),
         );
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       String messageErreur;
 
       messageErreur =

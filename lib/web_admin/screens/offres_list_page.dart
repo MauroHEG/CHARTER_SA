@@ -4,6 +4,8 @@ import 'offres_detail_page.dart';
 import 'offre_form_page.dart';
 
 class OffresListPage extends StatefulWidget {
+  const OffresListPage({super.key});
+
   @override
   _OffresListPageState createState() => _OffresListPageState();
 }
@@ -24,7 +26,7 @@ class _OffresListPageState extends State<OffresListPage> {
     DateTime currentDate = DateTime.now();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des offres'),
+        title: const Text('Liste des offres'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _offresStream,
@@ -34,7 +36,7 @@ class _OffresListPageState extends State<OffresListPage> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text('Chargement...');
+            return const Text('Chargement...');
           }
 
           return ListView(
@@ -78,28 +80,28 @@ class _OffresListPageState extends State<OffresListPage> {
                       ? Text(
                           'Débute le ${dateDebut.day}/${dateDebut.month}/${dateDebut.year}')
                       : IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: const Icon(Icons.delete),
                           onPressed: () {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Confirmation'),
-                                  content: Text(
+                                  title: const Text('Confirmation'),
+                                  content: const Text(
                                       'Voulez-vous vraiment supprimer cette offre ?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Annuler'),
+                                      child: const Text('Annuler'),
                                     ),
                                     TextButton(
                                       onPressed: () async {
                                         await _supprimerOffre(document.id);
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Supprimer'),
+                                      child: const Text('Supprimer'),
                                     ),
                                   ],
                                 );
@@ -118,12 +120,12 @@ class _OffresListPageState extends State<OffresListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PageFormulaireOffre(),
+              builder: (context) => const PageFormulaireOffre(),
             ),
           );
         },
-        child: Icon(Icons.add),
         tooltip: 'Créer une offre',
+        child: const Icon(Icons.add),
       ),
     );
   }

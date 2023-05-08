@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ReviewsListPage extends StatefulWidget {
+  const ReviewsListPage({super.key});
+
   @override
   _ReviewsListPageState createState() => _ReviewsListPageState();
 }
@@ -13,17 +15,17 @@ class _ReviewsListPageState extends State<ReviewsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des avis'),
+        title: const Text('Liste des avis'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: reviews.snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text("Une erreur s'est produite");
+            return const Text("Une erreur s'est produite");
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
 
           return ListView(
@@ -32,7 +34,7 @@ class _ReviewsListPageState extends State<ReviewsListPage> {
                   document.data() as Map<String, dynamic>;
               return Card(
                 child: ListTile(
-                  leading: CircleAvatar(
+                  leading: const CircleAvatar(
                     child: Icon(Icons.rate_review),
                   ),
                   title: Text(data['titre'] ?? 'Pas de titre'),

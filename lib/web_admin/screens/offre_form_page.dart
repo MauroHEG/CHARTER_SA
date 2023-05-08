@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/_internal/file_picker_web.dart';
@@ -16,6 +15,8 @@ import 'package:image_picker_web/image_picker_web.dart';
 import 'package:mime_type/mime_type.dart';
 
 class PageFormulaireOffre extends StatefulWidget {
+  const PageFormulaireOffre({super.key});
+
   @override
   _PageFormulaireOffreState createState() => _PageFormulaireOffreState();
 }
@@ -370,13 +371,13 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
         });
       }
     } else {
-      final ImagePicker _choixImage = ImagePicker();
-      List<XFile>? images = await _choixImage.pickMultiImage();
+      final ImagePicker choixImage = ImagePicker();
+      List<XFile>? images = await choixImage.pickMultiImage();
       setState(() {
         if (_imagesSelectionnees == null) {
           _imagesSelectionnees = images;
         } else {
-          _imagesSelectionnees!.addAll(images!);
+          _imagesSelectionnees!.addAll(images);
         }
       });
     }
@@ -406,7 +407,7 @@ class _PageFormulaireOffreState extends State<PageFormulaireOffre> {
 
     uploadInput.onChange.listen((e) {
       final files = uploadInput.files;
-      if (files != null && files.length > 0) {
+      if (files != null && files.isNotEmpty) {
         completer.complete(files);
       } else {
         completer.complete(null);

@@ -5,7 +5,7 @@ class ReservationFormPage extends StatefulWidget {
   final Map<String, dynamic>? reservationData;
   final bool isEditMode;
 
-  ReservationFormPage({this.reservationData, this.isEditMode = false});
+  const ReservationFormPage({super.key, this.reservationData, this.isEditMode = false});
 
   @override
   _ReservationFormPageState createState() => _ReservationFormPageState();
@@ -56,7 +56,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Créer une réservation'),
+        title: const Text('Créer une réservation'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -75,7 +75,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return const CircularProgressIndicator();
                       }
 
                       List<DropdownMenuItem<String>> userList =
@@ -87,7 +87,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                       }).toList();
 
                       return DropdownButtonFormField<String>(
-                        decoration: InputDecoration(labelText: 'Utilisateur'),
+                        decoration: const InputDecoration(labelText: 'Utilisateur'),
                         items: userList,
                         onChanged: (String? value) {
                           setState(() {
@@ -100,39 +100,39 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                   ),
                   // Les autres champs du formulaire
                   TextFormField(
-                    decoration: InputDecoration(labelText: "Nom de l'hôtel"),
+                    decoration: const InputDecoration(labelText: "Nom de l'hôtel"),
                     onChanged: (value) => _nomHotel = value,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: "Pays"),
+                    decoration: const InputDecoration(labelText: "Pays"),
                     onChanged: (value) => _nomPays = value,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: "Ville"),
+                    decoration: const InputDecoration(labelText: "Ville"),
                     onChanged: (value) => _nomVille = value,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: "Localisation de l'aéroport de départ"),
                     onChanged: (value) => _localisationAeroportDepart = value,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: "Localisation de l'aéroport d'arrivée"),
                     onChanged: (value) => _localisationAeroportArrivee = value,
                   ),
                   TextFormField(
                     decoration:
-                        InputDecoration(labelText: "Adresse de l'hôtel"),
+                        const InputDecoration(labelText: "Adresse de l'hôtel"),
                     onChanged: (value) => _adresseHotel = value,
                   ),
                   TextFormField(
                     decoration:
-                        InputDecoration(labelText: "Description du voyage"),
+                        const InputDecoration(labelText: "Description du voyage"),
                     onChanged: (value) => _descriptionVoyage = value,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: "Prix payé"),
+                    decoration: const InputDecoration(labelText: "Prix payé"),
                     keyboardType: TextInputType.number,
                     onChanged: (value) => _prixPaye = double.parse(value),
                   ),
@@ -168,7 +168,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                       }
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   // Bouton de création de réservation
                   SizedBox(
                     width: double.infinity,
@@ -210,7 +210,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                                 .set(reservationData)
                                 .then((value) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text('Réservation créée'),
                                 ),
                               );
@@ -231,12 +231,12 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                           });
                         }
                       },
-                      child: Text(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(16),
+                      ),
+                      child: const Text(
                         'Créer la réservation',
                         style: TextStyle(fontSize: 18),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.all(16),
                       ),
                     ),
                   ),

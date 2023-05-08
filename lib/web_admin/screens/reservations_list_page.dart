@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ReservationsListPage extends StatefulWidget {
+  const ReservationsListPage({super.key});
+
   @override
   _ReservationsListPageState createState() => _ReservationsListPageState();
 }
@@ -16,7 +18,7 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Liste des réservations'),
+          title: const Text('Liste des réservations'),
         ),
         body: StreamBuilder<QuerySnapshot>(
           stream: _reservationsStream,
@@ -27,7 +29,7 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text('Chargement...');
+              return const Text('Chargement...');
             }
 
             // Affichage de la liste des réservations
@@ -62,12 +64,12 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ReservationFormPage(),
+                builder: (context) => const ReservationFormPage(),
               ),
             );
           },
-          child: Icon(Icons.add),
           tooltip: 'Créer une réservation',
+          child: const Icon(Icons.add),
         ));
   }
 }
@@ -75,7 +77,7 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
 class ReservationDetailPage extends StatefulWidget {
   final Map<String, dynamic> reservationData;
 
-  ReservationDetailPage({required this.reservationData});
+  const ReservationDetailPage({super.key, required this.reservationData});
 
   @override
   _ReservationDetailPageState createState() => _ReservationDetailPageState();
@@ -105,66 +107,66 @@ class _ReservationDetailPageState extends State<ReservationDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Détail de la réservation'),
+        title: const Text('Détail de la réservation'),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Informations générales',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text('Nom du pays: ${widget.reservationData['nomPays']}'),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text('Utilisateur: ${_userName ?? 'Chargement...'}'),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                           "Nom de l'hôtel: ${widget.reservationData['nomHotel']}"),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text('Ville: ${widget.reservationData['nomVille']}'),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                           "Adresse de l'hôtel: ${widget.reservationData['adresseHotel']}"),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Détails du voyage',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                           "Description du voyage: ${widget.reservationData['descriptionVoyage']}"),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text("Prix payé: ${widget.reservationData['prixPaye']}"),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                           "Heure de décollage départ: ${widget.reservationData['heureDecollageDepart']}"),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                           "Heure de décollage arrivée: ${widget.reservationData['heureDecollageArrivee']}"),
                     ],

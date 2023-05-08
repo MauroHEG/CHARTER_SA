@@ -10,6 +10,8 @@ import 'package:charter_appli_travaux_mro/web_admin/screens/admin_conversations_
 import '../../utils/appStrings.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
+  const AdminDashboardScreen({super.key});
+
   @override
   _AdminDashboardScreenState createState() => _AdminDashboardScreenState();
 }
@@ -37,8 +39,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF7BF853),
-        title: Text('Tableau de bord', style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color(0xFF7BF853),
+        title: const Text('Tableau de bord', style: TextStyle(color: Colors.black)),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -47,33 +49,33 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
+                const Align(
                   alignment: Alignment.topCenter,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 50.0),
+                    padding: EdgeInsets.only(top: 16.0, bottom: 50.0),
                     child: Image(
                       image: AssetImage(AppStrings.cheminLogo),
                     ),
                   ),
                 ),
-                Text(
+                const Text(
                   'Statistiques',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ElevatedButton(
-                  child: Text("Conversations avec les clients"),
+                  child: const Text("Conversations avec les clients"),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            AdminConversationsScreen(),
+                            const AdminConversationsScreen(),
                       ),
                     );
                   },
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 FutureBuilder(
                   future: Future.wait([
                     _getNombreTotalUtilisateurs(),
@@ -83,7 +85,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   builder: (BuildContext context,
                       AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
                     int totalUtilisateurs = snapshot.data![0];
                     int totalAvis = snapshot.data![1];
@@ -97,7 +99,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => UserListPage()),
+                                builder: (context) => const UserListPage()),
                           );
                         }),
                         _buildStatCard(context, 'Avis', totalAvis, Colors.red,
@@ -105,7 +107,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ReviewsListPage()),
+                                builder: (context) => const ReviewsListPage()),
                           );
                         }),
                         _buildStatCard(context, 'Réservations',
@@ -113,28 +115,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ReservationsListPage()),
+                                builder: (context) => const ReservationsListPage()),
                           );
                         }),
                         _buildStatCard(context, 'Offres Charter', totalAvis,
-                            Color.fromARGB(255, 200, 54, 244), () {
+                            const Color.fromARGB(255, 200, 54, 244), () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => OffresListPage()),
+                                builder: (context) => const OffresListPage()),
                           );
                         }),
                       ],
                     );
                   },
                 ),
-                SizedBox(height: 24),
-                Text(
+                const SizedBox(height: 24),
+                const Text(
                   'Réservations par mois',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 16),
-                Container(
+                const SizedBox(height: 16),
+                SizedBox(
                   height: 200,
                   child: _buildReservationsChart(),
                 ),
@@ -149,7 +151,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildStatCard(BuildContext context, String title, int value,
       Color color, Null Function() param4) {
     return Expanded(
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         child: Card(
           color: color,
@@ -162,25 +164,25 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UserListPage()));
+                            builder: (context) => const UserListPage()));
                     break;
                   case 'Avis':
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ReviewsListPage()));
+                            builder: (context) => const ReviewsListPage()));
                     break;
                   case 'Réservations':
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ReservationsListPage()));
+                            builder: (context) => const ReservationsListPage()));
                     break;
                   case 'Offres Charter':
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => OffresListPage()));
+                            builder: (context) => const OffresListPage()));
                     break;
                 }
               },
@@ -190,14 +192,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
                   Text(
                     value.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
@@ -238,10 +240,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ],
             isCurved: true,
             colors: [
-              Color(0xFF7BF853),
+              const Color(0xFF7BF853),
             ],
             dotData: FlDotData(show: false),
-            belowBarData: BarAreaData(show: true, colors: [Color(0x227BF853)]),
+            belowBarData: BarAreaData(show: true, colors: [const Color(0x227BF853)]),
           ),
         ],
         titlesData: FlTitlesData(

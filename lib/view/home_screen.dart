@@ -10,13 +10,12 @@ import 'documents_screen.dart';
 import 'login_screen.dart';
 import 'offres_charter_screen.dart';
 import 'edit_profile_screen.dart';
-import 'services/conversation_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final String fullName;
   final String avatarPath;
 
-  HomeScreen({required this.fullName, required this.avatarPath});
+  const HomeScreen({super.key, required this.fullName, required this.avatarPath});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -117,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(
                   height: 20), // Ajouter un espacement entre les boutons
-              ClientChatButton(), // Ajouter le bouton de chat ici
+              const ClientChatButton(), // Ajouter le bouton de chat ici
             ],
           ),
         ),
@@ -135,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Mes documents') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DocumentsScreen()),
+              MaterialPageRoute(builder: (context) => const DocumentsScreen()),
             );
           }
 
@@ -153,14 +152,14 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Avis') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AvisScreen()),
+              MaterialPageRoute(builder: (context) => const AvisScreen()),
             );
           }
 
           if (text == 'Offres Charter') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => OffresCharterScreen()),
+              MaterialPageRoute(builder: (context) => const OffresCharterScreen()),
             );
           }
         },
@@ -182,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
       (Route<dynamic> route) =>
           false, // Cette condition permet de supprimer toutes les routes en dessous de la nouvelle route
     );

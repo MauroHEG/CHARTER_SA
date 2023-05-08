@@ -25,7 +25,7 @@ class _AppBar_profil_viewState extends State<AppBar_profil_view> {
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             actions: [
               IconButton(
-                icon: CircleAvatar(
+                icon: const CircleAvatar(
                   backgroundImage: AssetImage(AppStrings.cheminPhotoProfil),
                 ),
                 onPressed: () {},

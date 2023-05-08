@@ -14,7 +14,7 @@ class ContenuDossierScreen extends StatefulWidget {
   final String dossierId;
   final String dossierNom;
 
-  ContenuDossierScreen({required this.dossierId, required this.dossierNom});
+  const ContenuDossierScreen({super.key, required this.dossierId, required this.dossierNom});
 
   @override
   _ContenuDossierScreenState createState() => _ContenuDossierScreenState();
@@ -45,7 +45,7 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
 
           return ListView.builder(
@@ -53,7 +53,7 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot fichierSnapshot = snapshot.data!.docs[index];
               return ListTile(
-                leading: Icon(Icons.picture_as_pdf),
+                leading: const Icon(Icons.picture_as_pdf),
                 title: Text(fichierSnapshot.get('nom')),
                 onTap: () async {
                   String? url = fichierSnapshot.get('url');
@@ -88,7 +88,7 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                           content:
                               Text("Erreur lors de l'ouverture du fichier")),
                     );
@@ -100,8 +100,8 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
         onPressed: _ajouterFichier,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -127,7 +127,7 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
 
         // Si le fichier existe, affichez un message d'erreur
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Le fichier existe déjà")),
+          const SnackBar(content: Text("Le fichier existe déjà")),
         );
       } catch (e) {
         if (e is FirebaseException && e.code == 'object-not-found') {
@@ -166,7 +166,7 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Fichier ajouté avec succès')),
+            const SnackBar(content: Text('Fichier ajouté avec succès')),
           );
         } else {
           // Gérez les autres erreurs
@@ -175,7 +175,7 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Aucun fichier sélectionné")),
+        const SnackBar(content: Text("Aucun fichier sélectionné")),
       );
     }
   }
