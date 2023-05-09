@@ -43,8 +43,8 @@ class AuthService {
     }
   }
 
-  Future<void> seConnecter(
-      BuildContext context, String email, String password) async {
+  Future<void> seConnecter(String email, String password,
+      {BuildContext? context}) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -55,7 +55,7 @@ class AuthService {
       String role = await _recupererRole(userId);
 
       // Stockez le rôle dans le UserInfoProvider
-      Provider.of<UserInfoProvider>(context, listen: false).setRole(role);
+      Provider.of<UserInfoProvider>(context!, listen: false).setRole(role);
 
       // Connexion réussie, naviguer vers l'écran d'accueil ou l'écran du tableau de bord administrateur
       if (role == 'admin') {
@@ -83,7 +83,7 @@ class AuthService {
           "L'email ou le mot de passe sont incorrets. Veuillez réessayer";
 
       // Afficher le message d'erreur avec un SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context!).showSnackBar(
         SnackBar(
           content: Text(messageErreur),
           backgroundColor: Colors.red,

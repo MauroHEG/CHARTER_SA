@@ -89,12 +89,13 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
             _formKey.currentState?.save();
-            _authService.seConnecter(
-                context, _email, _password); // Modifiez cette ligne
+            _authService.seConnecter(_email, _password,
+                context: context); // Modifiez cette ligne
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF7BF853),
-            minimumSize: const Size(200, 60), // Modifiez la taille du bouton ici
+            minimumSize:
+                const Size(200, 60), // Modifiez la taille du bouton ici
             padding: const EdgeInsets.symmetric(
                 horizontal: 20), // Modifiez le padding ici si nécessaire
             shape: RoundedRectangleBorder(
@@ -116,7 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF7BF853),
-            minimumSize: const Size(200, 60), // Modifiez la taille du bouton ici
+            minimumSize:
+                const Size(200, 60), // Modifiez la taille du bouton ici
             padding: const EdgeInsets.symmetric(
                 horizontal: 20), // Modifiez le padding ici si nécessaire
             shape: RoundedRectangleBorder(

@@ -75,6 +75,11 @@ dev_dependencies:
   mockito: ^5.0.0
   firebase_auth_mocks: ^0.11.0
   fake_cloud_firestore: ^2.4.1+1
+  build_runner: ^2.1.9
+  build_test: ^2.1.7
+  build_web_compilers: ^4.0.3
+
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -17,7 +17,7 @@ void main() {
 
     test("Un utilisateur doit être ajouté à Firebase", () async {
       // Les données pour l'inscription
-      const email = 'test@test.com';
+      const email = 'testtest@test.com';
       const password = 'motdepasse';
       const firstName = 'Jean';
       const lastName = 'Dupont';
