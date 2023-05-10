@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReservationFormPage extends StatefulWidget {
   final Map<String, dynamic>? reservationData;
@@ -35,6 +36,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
           DateTime.parse(widget.reservationData!['heureDecollageDepart']));
       _heureDecollageArrivee = TimeOfDay.fromDateTime(
           DateTime.parse(widget.reservationData!['heureDecollageArrivee']));
+      _dateDebut = widget.reservationData!['dateDebut'].toDate();
+      _dateFin = widget.reservationData!['dateFin'].toDate();
     }
   }
 
@@ -138,6 +141,42 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                     decoration: const InputDecoration(labelText: "Prix payé"),
                     keyboardType: TextInputType.number,
                     onChanged: (value) => _prixPaye = double.parse(value),
+                  ),
+                  // Date de début
+                  ListTile(
+                    title: Text(
+                        "Date de début: ${_dateDebut != null ? DateFormat('dd/MM/yyyy').format(_dateDebut!) : 'Sélectionner la date'}"),
+                    onTap: () async {
+                      DateTime? dateSelectionnee = await showDatePicker(
+                        context: context,
+                        initialDate: _dateDebut ?? DateTime.now(),
+                        firstDate: DateTime(DateTime.now().year - 5),
+                        lastDate: DateTime(DateTime.now().year + 5),
+                      );
+                      if (dateSelectionnee != null) {
+                        setState(() {
+                          _dateDebut = dateSelectionnee;
+                        });
+                      }
+                    },
+                  ),
+                  // Date de fin
+                  ListTile(
+                    title: Text(
+                        "Date de fin: ${_dateFin != null ? DateFormat('dd/MM/yyyy').format(_dateFin!) : 'Sélectionner la date'}"),
+                    onTap: () async {
+                      DateTime? dateSelectionnee = await showDatePicker(
+                        context: context,
+                        initialDate: _dateFin ?? DateTime.now(),
+                        firstDate: DateTime(DateTime.now().year - 5),
+                        lastDate: DateTime(DateTime.now().year + 5),
+                      );
+                      if (dateSelectionnee != null) {
+                        setState(() {
+                          _dateFin = dateSelectionnee;
+                        });
+                      }
+                    },
                   ),
                   // Heure de décollage départ
                   ListTile(
