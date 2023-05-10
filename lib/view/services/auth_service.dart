@@ -19,7 +19,7 @@ class AuthService {
       : _auth = auth ?? FirebaseAuth.instance,
         _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Future<void> enregistrerUtilisateur(String email, String password,
+  Future<String?> enregistrerUtilisateur(String email, String password,
       String firstName, String lastName, String phoneNumber) async {
     try {
       UserCredential userCredential = await _auth
@@ -37,14 +37,18 @@ class AuthService {
         'role': 'user'
       });
     } on FirebaseAuthException catch (e) {
+      print(e.code);
+
       if (e.code == 'weak-password') {
-        throw Exception('Le mot de passe est trop faible.');
-      } else if (e.code == 'email-already-in-use') {
-        throw Exception('Le compte existe déjà pour cet e-mail.');
+        return 'Mot de passe trop faible';
+      } else if (e.message!.contains('The email address is already in use')) {
+        return 'Cet e-mail est déjà utilisé.';
       }
     } catch (e) {
-      rethrow;
+      return 'Erreur lors de l\'inscription : $e';
     }
+
+    return null;
   }
 
   Future<void> seConnecter(String email, String password,

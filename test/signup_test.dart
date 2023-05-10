@@ -1,6 +1,7 @@
 import 'dart:js_util';
 
 import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
@@ -45,7 +46,7 @@ void main() {
       expect(userDoc['role'], 'user');
     });
 
-    test('Un utilisateur est unique (pas deux fois  la même adresse mail)',
+    test('Un utilisateur est unique (pas deux fois la même adresse mail)',
         () async {
       // Les données pour l'inscription
       const email = 'testDoublon@test.com';
@@ -57,18 +58,13 @@ void main() {
       await authService.enregistrerUtilisateur(
           email, password, firstName, lastName, phoneNumber);
 
-      /*final user1 = auth.currentUser!;
-
-      await authService.enregistrerUtilisateur(
-          email, "motdepasse19", "Double2", "Doubleur2", "07777777");
-
-      final userDouble = auth.currentUser!;
-
-      expect(user1['email'], notEqual(first, second))*/
-      expect(
+      // Tenter d'inscrire un utilisateur avec la même adresse e-mail
+      // et vérifier si l'exception attendue est levée
+      expectLater(
           authService.enregistrerUtilisateur(
               email, password, firstName, lastName, phoneNumber),
-          throw Exception('Le compte existe déjà pour cet e-mail.'));
+          throwsA(isA<FirebaseAuthException>().having((e) => e.message,
+              'message', "The email address is already in use")));
     });
   });
 }

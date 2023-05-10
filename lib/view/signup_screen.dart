@@ -192,19 +192,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
       onPressed: () async {
         if (!_formKey.currentState!.validate()) return;
         _formKey.currentState?.save();
-        try {
-          await _authService.enregistrerUtilisateur(
-              _email!, _password!, _firstName!, _lastName!, _phoneNumber!);
-
+        String? errorMessage = await _authService.enregistrerUtilisateur(
+            _email!, _password!, _firstName!, _lastName!, _phoneNumber!);
+        if (errorMessage != null) {
+          // Afficher le message d'erreur
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        } else {
           // Naviguer vers l'écran de connexion ou l'écran d'accueil
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
-        } catch (e) {
-          print(e);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors de l\'inscription : $e')),
           );
         }
       },
