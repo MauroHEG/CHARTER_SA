@@ -5,7 +5,8 @@ class ReservationFormPage extends StatefulWidget {
   final Map<String, dynamic>? reservationData;
   final bool isEditMode;
 
-  const ReservationFormPage({super.key, this.reservationData, this.isEditMode = false});
+  const ReservationFormPage(
+      {super.key, this.reservationData, this.isEditMode = false});
 
   @override
   _ReservationFormPageState createState() => _ReservationFormPageState();
@@ -87,7 +88,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                       }).toList();
 
                       return DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Utilisateur'),
+                        decoration:
+                            const InputDecoration(labelText: 'Utilisateur'),
                         items: userList,
                         onChanged: (String? value) {
                           setState(() {
@@ -100,7 +102,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                   ),
                   // Les autres champs du formulaire
                   TextFormField(
-                    decoration: const InputDecoration(labelText: "Nom de l'hôtel"),
+                    decoration:
+                        const InputDecoration(labelText: "Nom de l'hôtel"),
                     onChanged: (value) => _nomHotel = value,
                   ),
                   TextFormField(
@@ -127,8 +130,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                     onChanged: (value) => _adresseHotel = value,
                   ),
                   TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: "Description du voyage"),
+                    decoration: const InputDecoration(
+                        labelText: "Description du voyage"),
                     onChanged: (value) => _descriptionVoyage = value,
                   ),
                   TextFormField(
