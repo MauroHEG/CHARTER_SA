@@ -35,6 +35,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return querySnapshot.size;
   }
 
+  Future<int> _getNombreTotalOffres() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('offres').get();
+    return querySnapshot.size;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +87,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     _getNombreTotalUtilisateurs(),
                     _getNombreTotalAvis(),
                     _getNombreTotalReservations(),
+                    _getNombreTotalOffres(),
                   ]),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<int>> snapshot) {
@@ -90,6 +97,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     int totalUtilisateurs = snapshot.data![0];
                     int totalAvis = snapshot.data![1];
                     int totalReservations = snapshot.data![2];
+                    int totalOffres = snapshot.data![3];
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -118,7 +126,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 builder: (context) => const ReservationsListPage()),
                           );
                         }),
-                        _buildStatCard(context, 'Offres Charter', totalAvis,
+                        _buildStatCard(context, 'Offres Charter', totalOffres,
                             const Color.fromARGB(255, 200, 54, 244), () {
                           Navigator.push(
                             context,
