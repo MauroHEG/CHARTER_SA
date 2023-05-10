@@ -64,7 +64,7 @@ void main() {
           authService.enregistrerUtilisateur(
               email, password, firstName, lastName, phoneNumber),
           throwsA(isA<FirebaseAuthException>().having((e) => e.message,
-              'message', "The email address is already in use")));
+              'message', "The email address is already in use.")));
     });
   });
 }
