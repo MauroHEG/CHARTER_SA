@@ -203,6 +203,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           );
         } catch (e) {
           print(e);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur lors de l\'inscription : $e')),
+          );
         }
       },
     );
