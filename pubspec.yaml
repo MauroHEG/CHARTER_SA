@@ -60,7 +60,8 @@ dependencies:
   path: ^1.8.1
   flutter_neumorphic: ^3.0.3
   firebase_messaging: ^14.4.0
-
+  intl: ^0.17.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
