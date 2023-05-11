@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class OffreDetailPage extends StatefulWidget {
   final Map<String, dynamic> offreData;
@@ -12,6 +15,8 @@ class OffreDetailPage extends StatefulWidget {
 class _OffreDetailPageState extends State<OffreDetailPage> {
   @override
   Widget build(BuildContext context) {
+    DateFormat format = DateFormat("dd/MM/yyyy"); // Format de la date
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détail de l\'offre'),
@@ -41,6 +46,71 @@ class _OffreDetailPageState extends State<OffreDetailPage> {
                       Text('Prix: ${widget.offreData['prix']}'),
                       const SizedBox(height: 5),
                       Text('Description: ${widget.offreData['description']}'),
+                      const SizedBox(height: 5),
+                      Text(
+                          'Date de début: ${format.format(widget.offreData['dateDebut'].toDate())}'),
+                      const SizedBox(height: 5),
+                      Text(
+                          'Date de fin: ${format.format(widget.offreData['dateFin'].toDate())}'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Text(
+                        'Documents',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        child: const Text('Télécharger le PDF'),
+                        onPressed: () async {
+                          String? pdfLink = widget.offreData['pdf'];
+                          if (pdfLink != null) {
+                            if (await canLaunch(pdfLink)) {
+                              await launch(pdfLink);
+                            } else {
+                              throw 'Impossible de lancer $pdfLink';
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                    'Aucun lien PDF disponible pour ce document.'),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 5),
+                      ...(widget.offreData['images'] != null
+                          ? [
+                              for (int i = 0;
+                                  i < widget.offreData['images'].length;
+                                  i++)
+                                ElevatedButton(
+                                  child: Text('Image ${i + 1}'),
+                                  onPressed: () async {
+                                    String imageUrl =
+                                        widget.offreData['images'][i];
+                                    if (await canLaunch(imageUrl)) {
+                                      await launch(imageUrl);
+                                    } else {
+                                      throw 'Impossible de lancer $imageUrl';
+                                    }
+                                  },
+                                )
+                            ]
+                          : []),
                     ],
                   ),
                 ),
@@ -50,5 +120,12 @@ class _OffreDetailPageState extends State<OffreDetailPage> {
         ),
       ),
     );
+  }
+
+  Future<String> getDownloadUrl(String filePath) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child(filePath);
+    String downloadURL = await ref.getDownloadURL();
+    return downloadURL;
   }
 }
