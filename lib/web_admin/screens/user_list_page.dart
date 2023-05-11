@@ -34,7 +34,7 @@ class _UserListPageState extends State<UserListPage> {
                   searchString = value.toLowerCase();
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   labelText: "Rechercher", suffixIcon: Icon(Icons.search)),
             ),
           ),
