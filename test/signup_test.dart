@@ -1,6 +1,7 @@
 import 'dart:js_util';
 
 import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +11,7 @@ void main() {
   group('Test de la méthode enregistrerUtilisateur', () {
     late AuthService authService;
     late MockFirebaseAuth auth;
-    late FakeFirebaseFirestore firestore;
+    late FirebaseFirestore firestore;
 
     setUp(() {
       auth = MockFirebaseAuth(signedIn: false);
