@@ -15,7 +15,8 @@ class HomeScreen extends StatefulWidget {
   final String fullName;
   final String avatarPath;
 
-  const HomeScreen({super.key, required this.fullName, required this.avatarPath});
+  const HomeScreen(
+      {super.key, required this.fullName, required this.avatarPath});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -159,7 +160,8 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Offres Charter') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const OffresCharterScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const OffresCharterScreen()),
             );
           }
         },

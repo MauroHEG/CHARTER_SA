@@ -5,7 +5,8 @@ class VilleDetailsScreen extends StatefulWidget {
   final String ville;
   final String pays;
 
-  const VilleDetailsScreen({super.key, required this.ville, required this.pays});
+  const VilleDetailsScreen(
+      {super.key, required this.ville, required this.pays});
 
   @override
   _VilleDetailsScreenState createState() => _VilleDetailsScreenState();
@@ -57,7 +58,8 @@ class _VilleDetailsScreenState extends State<VilleDetailsScreen> {
                 children: [
                   Text(
                     widget.ville,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   const Text(
@@ -71,7 +73,8 @@ class _VilleDetailsScreenState extends State<VilleDetailsScreen> {
                     },
                     icon: const Icon(Icons.download),
                     label: const Text('Télécharger la brochure'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF7BF853)),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7BF853)),
                   ),
                 ],
               ),

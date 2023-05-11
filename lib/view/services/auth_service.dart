@@ -32,6 +32,7 @@ class AuthService {
           .set({
         'prenom': firstName,
         'nom': lastName,
+        'nom_lower': lastName.toLowerCase(),
         'email': email,
         'telephone': phoneNumber,
         'role': 'user'
