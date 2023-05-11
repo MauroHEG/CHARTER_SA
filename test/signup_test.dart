@@ -67,4 +67,11 @@ void main() {
               'message', "The email address is already in use.")));
     });
   });
+
+  test('champs obligatoire (peut pas sinscrire sans les champs obligatoires)',
+      () {});
+
+  test('mots de passe trop faible', () {});
+
+  test('validation format adresse mail', () {});
 }
