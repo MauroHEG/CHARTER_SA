@@ -3,11 +3,13 @@ import 'package:charter_appli_travaux_mro/web_admin/screens/reservations_list_pa
 import 'package:charter_appli_travaux_mro/web_admin/screens/review_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/user_list_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/admin_conversations_screen.dart';
 
 import '../../utils/appStrings.dart';
+import '../../view/login_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -46,7 +48,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF7BF853),
-        title: const Text('Tableau de bord', style: TextStyle(color: Colors.black)),
+        title: const Text('Tableau de bord',
+            style: TextStyle(color: Colors.black)),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.black),
+            onPressed: _deconnexionEtRedirection,
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -123,7 +132,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const ReservationsListPage()),
+                                builder: (context) =>
+                                    const ReservationsListPage()),
                           );
                         }),
                         _buildStatCard(context, 'Offres Charter', totalOffres,
@@ -184,7 +194,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const ReservationsListPage()));
+                            builder: (context) =>
+                                const ReservationsListPage()));
                     break;
                   case 'Offres Charter':
                     Navigator.push(
@@ -251,7 +262,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const Color(0xFF7BF853),
             ],
             dotData: FlDotData(show: false),
-            belowBarData: BarAreaData(show: true, colors: [const Color(0x227BF853)]),
+            belowBarData:
+                BarAreaData(show: true, colors: [const Color(0x227BF853)]),
           ),
         ],
         titlesData: FlTitlesData(
@@ -293,6 +305,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
       ),
+    );
+  }
+
+  Future<void> _deconnexionEtRedirection() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (Route<dynamic> route) =>
+          false, // Cette condition permet de supprimer toutes les routes en dessous de la nouvelle route
     );
   }
 }
