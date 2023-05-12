@@ -12,113 +12,147 @@ class ReservationsListPage extends StatefulWidget {
 }
 
 class _ReservationsListPageState extends State<ReservationsListPage> {
-  // Récupérer la collection "reservations" depuis Firebase
-  final Stream<QuerySnapshot> _reservationsStream =
-      FirebaseFirestore.instance.collection('reservations').snapshots();
+  CollectionReference reservations =
+      FirebaseFirestore.instance.collection('reservations');
+  String searchCountryString = "";
+
+  Future<void> deleteReservation(String id) async {
+    await reservations.doc(id).delete();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Liste des réservations'),
-        ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: _reservationsStream,
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Text('Erreur: ${snapshot.error}');
-            }
+      appBar: AppBar(
+        title: const Text('Liste des réservations'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchCountryString = value.toLowerCase();
+                });
+              },
+              decoration: const InputDecoration(
+                  labelText: "Rechercher par pays",
+                  suffixIcon: Icon(Icons.search)),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: reservations.snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Une erreur s\'est produite');
+                }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text('Chargement...');
-            }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
 
-            // Affichage de la liste des réservations
-            return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> donnees =
-                    document.data() as Map<String, dynamic>;
-                return InkWell(
-                  onTap: () {
-                    // Naviguer vers la page de détail de la réservation
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReservationDetailPage(
-                          reservationData: donnees,
+                // Filtrer les réservations par le nom du pays
+                final results = snapshot.data!.docs.where((res) {
+                  final reservationData = res.data() as Map<String, dynamic>;
+                  final countryNameMatches = reservationData['nomPays']
+                      .toString()
+                      .toLowerCase()
+                      .contains(searchCountryString);
+                  return countryNameMatches;
+                }).toList();
+
+                return ListView(
+                  children: results.map((DocumentSnapshot document) {
+                    Map<String, dynamic> donnees =
+                        document.data() as Map<String, dynamic>;
+                    return InkWell(
+                      onTap: () {
+                        // Naviguer vers la page de détail de la réservation
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ReservationDetailPage(
+                              reservationData: donnees,
+                            ),
+                          ),
+                        );
+                      },
+                      child: ListTile(
+                        title: Text(donnees['nomPays']),
+                        subtitle: FutureBuilder<String>(
+                          future: getUserName(donnees['utilisateur']),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<String> snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(snapshot.data!);
+                            } else if (snapshot.hasError) {
+                              return Text('Erreur: ${snapshot.error}');
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Confirmer la suppression'),
+                                  content: const Text(
+                                      'Voulez-vous vraiment supprimer cette réservation ?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('ANNULER'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('CONFIRMER'),
+                                      onPressed: () {
+                                        // Supprimer la réservation de la base de données
+                                        FirebaseFirestore.instance
+                                            .collection('reservations')
+                                            .doc(document.id)
+                                            .delete();
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
                     );
-                  },
-                  child: ListTile(
-                    title: Text(donnees['nomPays']),
-                    subtitle: FutureBuilder<String>(
-                      future: getUserName(donnees['utilisateur']),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<String> snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(snapshot.data!);
-                        } else if (snapshot.hasError) {
-                          return Text('Erreur: ${snapshot.error}');
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      },
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Confirmer la suppression'),
-                              content: const Text(
-                                  'Voulez-vous vraiment supprimer cette réservation ?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('ANNULER'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('CONFIRMER'),
-                                  onPressed: () {
-                                    // Supprimer la réservation de la base de données
-                                    FirebaseFirestore.instance
-                                        .collection('reservations')
-                                        .doc(document.id)
-                                        .delete();
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                  }).toList(),
                 );
-              }).toList(),
-            );
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Naviguer vers la page de formulaire de réservation
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ReservationFormPage(),
-              ),
-            );
-          },
-          tooltip: 'Créer une réservation',
-          child: const Icon(Icons.add),
-        ));
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+// Naviguer vers la page de formulaire de réservation
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ReservationFormPage(),
+            ),
+          );
+        },
+        tooltip: 'Créer une réservation',
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 
   Future<String> getUserName(String userId) async {
