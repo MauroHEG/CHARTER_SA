@@ -15,6 +15,15 @@ class ReservationFormPage extends StatefulWidget {
 
 class _ReservationFormPageState extends State<ReservationFormPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController _descriptionVoyageController = TextEditingController();
+  TextEditingController _prixPayeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _descriptionVoyageController.dispose();
+    _prixPayeController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -38,6 +47,10 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
           DateTime.parse(widget.reservationData!['heureDecollageArrivee']));
       _dateDebut = widget.reservationData!['dateDebut'].toDate();
       _dateFin = widget.reservationData!['dateFin'].toDate();
+      _isOffer = widget.reservationData!['isOffer']; // Ajouté
+
+      _descriptionVoyageController.text = _descriptionVoyage!;
+      _prixPayeController.text = _prixPaye.toString();
     }
   }
 
@@ -55,6 +68,8 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
   double? _prixPaye;
   TimeOfDay? _heureDecollageDepart;
   TimeOfDay? _heureDecollageArrivee;
+  bool _isOffer = false; // Ajouté
+  String? _selectedOffer;
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +118,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                       );
                     },
                   ),
+
                   // Les autres champs du formulaire
                   TextFormField(
                     decoration:
@@ -133,14 +149,77 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                     onChanged: (value) => _adresseHotel = value,
                   ),
                   TextFormField(
+                    controller: _descriptionVoyageController,
                     decoration: const InputDecoration(
                         labelText: "Description du voyage"),
                     onChanged: (value) => _descriptionVoyage = value,
                   ),
                   TextFormField(
+                    controller: _prixPayeController,
                     decoration: const InputDecoration(labelText: "Prix payé"),
                     keyboardType: TextInputType.number,
                     onChanged: (value) => _prixPaye = double.parse(value),
+                  ),
+                  CheckboxListTile(
+                    title: const Text('Offre spéciale?'),
+                    value: _isOffer,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isOffer = value!;
+                      });
+                    },
+                  ),
+                  // Ajoutez ici le FutureBuilder pour le champ Offre Spéciale
+                  FutureBuilder<QuerySnapshot>(
+                    future:
+                        FirebaseFirestore.instance.collection('offres').get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      List<DropdownMenuItem<String>> offerList =
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        return DropdownMenuItem<String>(
+                          value: document.id,
+                          child: Text(document['titre']),
+                        );
+                      }).toList();
+
+                      return Visibility(
+                        visible: _isOffer ?? false,
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                              labelText: 'Offre Spéciale'),
+                          items: offerList,
+                          onChanged: (String? value) {
+                            setState(() {
+                              _selectedOffer = value;
+
+                              // Récupère l'offre sélectionnée
+                              DocumentSnapshot selectedOfferDoc =
+                                  snapshot.data!.docs.firstWhere(
+                                      (doc) => doc.id == _selectedOffer);
+
+                              // Met à jour les champs avec les informations de l'offre sélectionnée
+                              _prixPaye = selectedOfferDoc['prix'];
+                              _dateDebut =
+                                  selectedOfferDoc['dateDebut'].toDate();
+                              _dateFin = selectedOfferDoc['dateFin'].toDate();
+                              _descriptionVoyage =
+                                  selectedOfferDoc['description'];
+
+                              // Met à jour les TextEditingController avec les nouvelles valeurs
+                              _descriptionVoyageController.text =
+                                  _descriptionVoyage!;
+                              _prixPayeController.text = _prixPaye.toString();
+                            });
+                          },
+                          value: _selectedOffer,
+                        ),
+                      );
+                    },
                   ),
                   // Date de début
                   ListTile(
@@ -181,7 +260,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                   // Heure de décollage départ
                   ListTile(
                     title: Text(
-                        "Heure de décollage départ: ${_heureDecollageDepart?.format(context) ?? 'Sélectionner l\'heure'}"),
+                        "Heure de décollage départ: ${_heureDecollageDepart != null ? _heureDecollageDepart!.format(context) : 'Sélectionner l\'heure'}"),
                     onTap: () async {
                       TimeOfDay? heureSelectionnee = await showTimePicker(
                         context: context,
@@ -197,7 +276,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                   // Heure de décollage arrivée
                   ListTile(
                     title: Text(
-                        "Heure de décollage arrivée: ${_heureDecollageArrivee?.format(context) ?? 'Sélectionner l\'heure'}"),
+                        "Heure de décollage arrivée: ${_heureDecollageArrivee != null ? _heureDecollageArrivee!.format(context) : 'Sélectionner l\'heure'}"),
                     onTap: () async {
                       TimeOfDay? heureSelectionnee = await showTimePicker(
                         context: context,
@@ -210,15 +289,18 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                       }
                     },
                   ),
-                  const SizedBox(height: 16),
-                  // Bouton de création de réservation
-                  SizedBox(
-                    width: double.infinity,
+                  // Bouton pour soumettre le formulaire
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          // Créez un objet Map contenant les données de la réservation
-                          Map<String, dynamic> reservationData = {
+                          // Si le formulaire est valide, affiche un Snackbar
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Traitement des données')));
+
+                          Map<String, dynamic> data = {
                             'utilisateur': _selectedUser,
                             'nomHotel': _nomHotel,
                             'nomPays': _nomPays,
@@ -229,57 +311,31 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                                 _localisationAeroportArrivee,
                             'adresseHotel': _adresseHotel,
                             'descriptionVoyage': _descriptionVoyage,
-                            'dateDebut': _dateDebut,
-                            'dateFin': _dateFin,
                             'prixPaye': _prixPaye,
                             'heureDecollageDepart':
-                                _heureDecollageDepart?.format(context),
+                                _heureDecollageDepart!.format(context),
                             'heureDecollageArrivee':
-                                _heureDecollageArrivee?.format(context),
+                                _heureDecollageArrivee!.format(context),
+                            'dateDebut': _dateDebut,
+                            'dateFin': _dateFin,
+                            'isOffer': _isOffer, // Ajouté
                           };
 
-                          // Ajouter la réservation à la collection "reservations" de Firebase
-                          FirebaseFirestore.instance
-                              .collection('reservations')
-                              .add(reservationData)
-                              .then((value) {
-                            // Ajouter la réservation à la sous-collection "reservations" de l'utilisateur
+                          if (widget.isEditMode) {
                             FirebaseFirestore.instance
-                                .collection('utilisateurs')
-                                .doc(_selectedUser)
                                 .collection('reservations')
-                                .doc(value.id)
-                                .set(reservationData)
-                                .then((value) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Réservation créée'),
-                                ),
-                              );
-                              Navigator.pop(context);
-                            }).catchError((error) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Erreur: $error'),
-                                ),
-                              );
-                            });
-                          }).catchError((error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Erreur: $error'),
-                              ),
-                            );
-                          });
+                                .doc(widget.reservationData!['id'])
+                                .update(data);
+                          } else {
+                            FirebaseFirestore.instance
+                                .collection('reservations')
+                                .add(data);
+                          }
+
+                          Navigator.pop(context);
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(16),
-                      ),
-                      child: const Text(
-                        'Créer la réservation',
-                        style: TextStyle(fontSize: 18),
-                      ),
+                      child: const Text('Soumettre'),
                     ),
                   ),
                 ],
