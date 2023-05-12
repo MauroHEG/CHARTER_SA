@@ -81,56 +81,62 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
                           ),
                         );
                       },
-                      child: ListTile(
-                        title: Text(donnees['nomPays']),
-                        subtitle: FutureBuilder<String>(
-                          future: getUserName(donnees['utilisateur']),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<String> snapshot) {
-                            if (snapshot.hasData) {
-                              return Text(snapshot.data!);
-                            } else if (snapshot.hasError) {
-                              return Text('Erreur: ${snapshot.error}');
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          },
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Confirmer la suppression'),
-                                  content: const Text(
-                                      'Voulez-vous vraiment supprimer cette réservation ?'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: const Text('ANNULER'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    TextButton(
-                                      child: const Text('CONFIRMER'),
-                                      onPressed: () {
-                                        // Supprimer la réservation de la base de données
-                                        FirebaseFirestore.instance
-                                            .collection('reservations')
-                                            .doc(document.id)
-                                            .delete();
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
+                      child: Container(
+                          // Si isOffer est true, définir la couleur de fond en vert clair, sinon la laisser transparente
+                          color: donnees['isOffer'] == true
+                              ? Colors.lightGreen[100]
+                              : Colors.transparent,
+                          child: ListTile(
+                            title: Text(donnees['nomPays']),
+                            subtitle: FutureBuilder<String>(
+                              future: getUserName(donnees['utilisateur']),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> snapshot) {
+                                if (snapshot.hasData) {
+                                  return Text(snapshot.data!);
+                                } else if (snapshot.hasError) {
+                                  return Text('Erreur: ${snapshot.error}');
+                                } else {
+                                  return CircularProgressIndicator();
+                                }
+                              },
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                          'Confirmer la suppression'),
+                                      content: const Text(
+                                          'Voulez-vous vraiment supprimer cette réservation ?'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('ANNULER'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('CONFIRMER'),
+                                          onPressed: () {
+                                            // Supprimer la réservation de la base de données
+                                            FirebaseFirestore.instance
+                                                .collection('reservations')
+                                                .doc(document.id)
+                                                .delete();
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
-                      ),
+                            ),
+                          )),
                     );
                   }).toList(),
                 );
