@@ -21,7 +21,7 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  ReservationType _selectedType = ReservationType.all;
+  ReservationType _reservationType = ReservationType.all;
 
   Future<int> _getNombreTotalUtilisateurs() async {
     QuerySnapshot querySnapshot =
@@ -158,6 +158,41 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
+                Row(
+                  children: <Widget>[
+                    Text('Type de réservation : '),
+                    Radio(
+                      value: ReservationType.all,
+                      groupValue: _reservationType,
+                      onChanged: (ReservationType? value) {
+                        setState(() {
+                          _reservationType = value!;
+                        });
+                      },
+                    ),
+                    Text('Toutes'),
+                    Radio(
+                      value: ReservationType.offer,
+                      groupValue: _reservationType,
+                      onChanged: (ReservationType? value) {
+                        setState(() {
+                          _reservationType = value!;
+                        });
+                      },
+                    ),
+                    Text('Avec offre'),
+                    Radio(
+                      value: ReservationType.standard,
+                      groupValue: _reservationType,
+                      onChanged: (ReservationType? value) {
+                        setState(() {
+                          _reservationType = value!;
+                        });
+                      },
+                    ),
+                    Text('Standard'),
+                  ],
+                ),
                 SizedBox(
                   height: 200,
                   child: _buildReservationsChart(),
@@ -239,15 +274,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Future<List<int>> _getReservationsParMois() async {
     List<int> reservationsParMois =
         List.filled(12, 0); // Initialiser la liste avec zéro
-
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('reservations').get();
 
     for (var doc in querySnapshot.docs) {
-      DateTime dateDebut =
-          (doc.data() as Map<String, dynamic>)['dateDebut'].toDate();
-      int mois = dateDebut.month - 1; // Ajuster l'index car il commence à 0
-      reservationsParMois[mois]++;
+      bool isOffer = (doc.data() as Map<String, dynamic>)['isOffer'];
+      if (_reservationType == ReservationType.all ||
+          (_reservationType == ReservationType.offer && isOffer) ||
+          (_reservationType == ReservationType.standard && !isOffer)) {
+        DateTime dateDebut =
+            (doc.data() as Map<String, dynamic>)['dateDebut'].toDate();
+        int mois = dateDebut.month - 1; // Ajuster l'index car il commence à 0
+        reservationsParMois[mois]++;
+      }
     }
 
     return reservationsParMois;
@@ -257,10 +296,20 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return FutureBuilder(
       future: _getReservationsParMois(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        // Si les données sont en train de charger
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
         }
 
+        // Si une erreur s'est produite
+        if (snapshot.hasError) {
+          return Text(
+            'Une erreur est survenue lors du chargement des données',
+            style: TextStyle(color: Colors.red),
+          );
+        }
+
+        // Si les données sont chargées
         List<int>? reservationsParMois = snapshot.data;
         List<FlSpot> spots = [];
         for (int i = 0; i < reservationsParMois!.length; i++) {
