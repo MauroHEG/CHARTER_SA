@@ -11,6 +11,8 @@ import 'package:charter_appli_travaux_mro/web_admin/screens/admin_conversations_
 import '../../utils/appStrings.dart';
 import '../../view/login_screen.dart';
 
+enum ReservationType { all, offer, standard }
+
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -19,6 +21,8 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
+  ReservationType _selectedType = ReservationType.all;
+
   Future<int> _getNombreTotalUtilisateurs() async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('utilisateurs').get();
@@ -232,79 +236,98 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
+  Future<List<int>> _getReservationsParMois() async {
+    List<int> reservationsParMois =
+        List.filled(12, 0); // Initialiser la liste avec zéro
+
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('reservations').get();
+
+    for (var doc in querySnapshot.docs) {
+      DateTime dateDebut =
+          (doc.data() as Map<String, dynamic>)['dateDebut'].toDate();
+      int mois = dateDebut.month - 1; // Ajuster l'index car il commence à 0
+      reservationsParMois[mois]++;
+    }
+
+    return reservationsParMois;
+  }
+
   Widget _buildReservationsChart() {
-    return LineChart(
-      LineChartData(
-        minX: 0,
-        maxX: 11,
-        minY: 0,
-        maxY:
-            100, // Vous pouvez ajuster cette valeur en fonction de vos besoins
-        lineBarsData: [
-          LineChartBarData(
-            spots: [
-// Remplacer ces valeurs par les données réelles de réservations par mois
-              FlSpot(0, 20),
-              FlSpot(1, 30),
-              FlSpot(2, 50),
-              FlSpot(3, 40),
-              FlSpot(4, 60),
-              FlSpot(5, 70),
-              FlSpot(6, 80),
-              FlSpot(7, 90),
-              FlSpot(8, 100),
-              FlSpot(9, 50),
-              FlSpot(10, 60),
-              FlSpot(11, 40),
+    return FutureBuilder(
+      future: _getReservationsParMois(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return CircularProgressIndicator();
+        }
+
+        List<int>? reservationsParMois = snapshot.data;
+        List<FlSpot> spots = [];
+        for (int i = 0; i < reservationsParMois!.length; i++) {
+          spots.add(FlSpot(i.toDouble(), reservationsParMois[i].toDouble()));
+        }
+
+        return LineChart(
+          LineChartData(
+            minX: 0,
+            maxX: 11,
+            minY: 0,
+            maxY: reservationsParMois
+                .reduce((curr, next) => curr > next ? curr : next)
+                .toDouble(), // Mettre à jour maxY avec le nombre de réservations le plus élevé
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                colors: [
+                  const Color(0xFF7BF853),
+                ],
+                dotData: FlDotData(show: false),
+                belowBarData:
+                    BarAreaData(show: true, colors: [const Color(0x227BF853)]),
+              ),
             ],
-            isCurved: true,
-            colors: [
-              const Color(0xFF7BF853),
-            ],
-            dotData: FlDotData(show: false),
-            belowBarData:
-                BarAreaData(show: true, colors: [const Color(0x227BF853)]),
+            titlesData: FlTitlesData(
+              leftTitles: SideTitles(showTitles: false),
+              bottomTitles: SideTitles(
+                showTitles: true,
+                getTitles: (value) {
+                  switch (value.toInt()) {
+                    case 0:
+                      return 'Jan';
+                    case 1:
+                      return 'Fév';
+                    case 2:
+                      return 'Mar';
+                    case 3:
+                      return 'Avr';
+                    case 4:
+                      return 'Mai';
+                    case 5:
+                      return 'Jun';
+                    case 6:
+                      return 'Jul';
+                    case 7:
+                      return 'Aoû';
+                    case 8:
+                      return 'Sep';
+                    case 9:
+                      return 'Oct';
+                    case 10:
+                      return 'Nov';
+                    case 11:
+                      return 'Déc';
+                    default:
+                      return '';
+                  }
+                },
+              ),
+            ),
+            gridData: FlGridData(show: false),
+            borderData: FlBorderData(show: false),
           ),
-        ],
-        titlesData: FlTitlesData(
-          leftTitles: SideTitles(showTitles: false),
-          bottomTitles: SideTitles(
-            showTitles: true,
-            getTitles: (value) {
-              switch (value.toInt()) {
-                case 0:
-                  return 'Jan';
-                case 1:
-                  return 'Fév';
-                case 2:
-                  return 'Mar';
-                case 3:
-                  return 'Avr';
-                case 4:
-                  return 'Mai';
-                case 5:
-                  return 'Jun';
-                case 6:
-                  return 'Jul';
-                case 7:
-                  return 'Aoû';
-                case 8:
-                  return 'Sep';
-                case 9:
-                  return 'Oct';
-                case 10:
-                  return 'Nov';
-                case 11:
-                  return 'Déc';
-                default:
-                  return '';
-              }
-            },
-          ),
-        ),
-        gridData: FlGridData(show: false),
-        borderData: FlBorderData(show: false),
-      ),
+        );
+      },
     );
   }
 
