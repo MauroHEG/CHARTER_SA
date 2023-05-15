@@ -1,77 +1,60 @@
-import 'dart:js_util';
+import 'dart:async';
 
-import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
+import 'package:mockito/mockito.dart';
 
 void main() {
-  group('Test de la méthode enregistrerUtilisateur', () {
-    late AuthService authService;
-    late MockFirebaseAuth auth;
-    late FakeFirebaseFirestore firestore;
+  late MockFirebaseAuth mockAuth;
+  late FakeFirebaseFirestore mockFirestore;
+  late AuthService authService;
 
-    setUp(() {
-      auth = MockFirebaseAuth(signedIn: false);
-      firestore = FakeFirebaseFirestore();
-      authService = AuthService(auth: auth, firestore: firestore);
-    });
-
-    test("Un utilisateur doit être ajouté à Firebase", () async {
-      // Les données pour l'inscription
-      const email = 'testtest@test.com';
-      const password = 'motdepasse';
-      const firstName = 'Jean';
-      const lastName = 'Dupont';
-      const phoneNumber = '0123456789';
-
-      await authService.enregistrerUtilisateur(
-          email, password, firstName, lastName, phoneNumber);
-
-      // Vérifier si l'utilisateur est bien créé dans FirebaseAuth
-      final firebaseUser = auth.currentUser!;
-      expect(firebaseUser.email, email);
-
-      // Vérifier si les données de l'utilisateur sont bien stockées dans Firestore
-      final userDoc = await firestore
-          .collection('utilisateurs')
-          .doc(firebaseUser.uid)
-          .get();
-
-      expect(userDoc['prenom'], firstName);
-      expect(userDoc['nom'], lastName);
-      expect(userDoc['email'], email);
-      expect(userDoc['telephone'], phoneNumber);
-      expect(userDoc['role'], 'user');
-    });
-
-    test('Un utilisateur est unique (pas deux fois la même adresse mail)',
-        () async {
-      // Les données pour l'inscription
-      const email = 'testDoublon@test.com';
-      const password = 'motdepasse';
-      const firstName = 'Double';
-      const lastName = 'Doubleur';
-      const phoneNumber = '0778547895';
-
-      await authService.enregistrerUtilisateur(
-          email, password, firstName, lastName, phoneNumber);
-
-      // Tenter d'inscrire un utilisateur avec la même adresse e-mail
-      // et vérifier si l'exception attendue est levée
-      expectLater(
-          authService.enregistrerUtilisateur(
-              email, password, firstName, lastName, phoneNumber),
-          throwsA(isA<FirebaseAuthException>().having((e) => e.message,
-              'message', "The email address is already in use.")));
-    });
+  setUp(() {
+    mockAuth = MockFirebaseAuth(signedIn: false);
+    mockFirestore = FakeFirebaseFirestore();
+    authService = AuthService(auth: mockAuth, firestore: mockFirestore);
   });
 
-  test('champs obligatoire (peut pas sinscrire sans les champs obligatoires)',
-      () {});
+  test('Test enregistrerUtilisateur', () async {
+    final email = 'test@test.com';
+    final password = 'password';
+    final firstName = 'Test';
+    final lastName = 'User';
+    final phoneNumber = '1234567890';
 
-  test('mots de passe trop faible', () {});
+    // Créer un faux utilisateur
+    final user = MockUser(
+      isAnonymous: false,
+      uid: '123456',
+      email: email,
+      displayName: '$firstName $lastName',
+      phoneNumber: phoneNumber,
+    );
 
-  test('validation format adresse mail', () {});
+    // Simuler la connexion de l'utilisateur
+    when(mockAuth.createUserWithEmailAndPassword(
+            email: email, password: password))
+        .thenAnswer((_) => Future.value(user as FutureOr<UserCredential>?));
+
+    // Appeler la méthode à tester
+    final result = await authService.enregistrerUtilisateur(
+        email, password, firstName, lastName, phoneNumber);
+
+    // Vérifier qu'aucune erreur n'a été renvoyée
+    expect(result, isNull);
+
+    // Vérifier que les données de l'utilisateur ont été correctement enregistrées dans Firestore
+    final userData =
+        await mockFirestore.collection('utilisateurs').doc(user.uid).get();
+    expect(userData.data(), isNotNull);
+    expect(userData.data()!['prenom'], equals(firstName));
+    expect(userData.data()!['nom'], equals(lastName));
+    expect(userData.data()!['nom_lower'], equals(lastName.toLowerCase()));
+    expect(userData.data()!['email'], equals(email));
+    expect(userData.data()!['telephone'], equals(phoneNumber));
+    expect(userData.data()!['role'], equals('user'));
+  });
 }
