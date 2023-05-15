@@ -4,7 +4,6 @@ class User {
   final String prenom;
   final String email;
   final String motDePasse;
-  final DateTime dateDeNaissance;
   final String telephone;
   final String adresse;
 
@@ -14,7 +13,6 @@ class User {
     required this.prenom,
     required this.email,
     required this.motDePasse,
-    required this.dateDeNaissance,
     required this.telephone,
     required this.adresse,
   });
