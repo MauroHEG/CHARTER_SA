@@ -6,10 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'dart:html' as html;
-import 'dart:typed_data';
+//import 'dart:typed_data';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:mime/mime.dart';
+//import 'package:mime/mime.dart';
 import 'package:mime_type/mime_type.dart';
 
 class OffreService {
@@ -66,7 +66,9 @@ class OffreService {
     return byteDataList;
   }
 
-  Future<void> selectionnerImages() async {
+  Future<List<String>?> selectionnerImages() async {
+    List<String> nomsFichiers = [];
+
     if (kIsWeb) {
       List<html.File>? imageFiles = await ImagePickerWeb.getMultiImagesAsFile();
       if (imageFiles != null) {
@@ -75,6 +77,7 @@ class OffreService {
         } else {
           _imagesSelectionneesHtml!.addAll(imageFiles);
         }
+        nomsFichiers = imageFiles.map((file) => file.name).toList();
       }
     } else {
       final ImagePicker choixImage = ImagePicker();
@@ -84,7 +87,12 @@ class OffreService {
       } else {
         _imagesSelectionnees!.addAll(images);
       }
+      nomsFichiers = images?.map((file) => file.name).toList() ?? [];
     }
+
+    return nomsFichiers.isEmpty
+        ? null
+        : nomsFichiers; // Retourner la liste des noms de fichiers ou null si aucun fichier n'est sélectionné
   }
 
   Future<Uint8List> _convertirFichierHtmlEnUint8List(html.File fichier) async {
@@ -122,7 +130,7 @@ class OffreService {
     return completer.future;
   }
 
-  Future<void> selectionnerPdf() async {
+  Future<String?> selectionnerPdf() async {
     FilePickerResult? resultat = await FilePickerWeb.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
@@ -132,7 +140,9 @@ class OffreService {
       String nomFichier = resultat.files.single.name;
       _octetsPdfSelectionne = fichier;
       _nomPdfSelectionne = nomFichier;
+      return nomFichier; // Retourner le nom du fichier
     }
+    return null; // Retourner null si aucun fichier n'est sélectionné
   }
 
   Future<void> _televerserFichiers() async {

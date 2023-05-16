@@ -16,6 +16,9 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
   final _controleurDescription = TextEditingController();
   DateTime _dateDebut = DateTime.now();
   DateTime _dateFin = DateTime.now().add(const Duration(days: 7));
+  List<String> _imagesSelectionnees = [];
+  List<String> _pdfsSelectionnes = [];
+  String? _pdfSelectionne;
 
   final _formatDate = DateFormat('dd/MM/yyyy');
 
@@ -40,102 +43,188 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
         child: Form(
           child: ListView(
             children: [
-              TextFormField(
-                controller: _controleurTitre,
-                decoration: const InputDecoration(labelText: 'Titre'),
-              ),
-              TextFormField(
-                controller: _controleurPrix,
-                decoration: const InputDecoration(labelText: 'Prix'),
-                keyboardType: TextInputType.number,
-              ),
-              TextFormField(
-                controller: _controleurDescription,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-              ),
-              Row(
-                children: [
-                  Text('Date de début : ${_formatDate.format(_dateDebut)}'),
-                  ElevatedButton(
-                    child: const Text('Sélectionner'),
-                    onPressed: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: _dateDebut,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                      );
-                      if (date != null) {
-                        setState(() {
-                          _dateDebut = date;
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('Date de fin : ${_formatDate.format(_dateFin)}'),
-                  ElevatedButton(
-                    child: const Text('Sélectionner'),
-                    onPressed: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: _dateFin,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                      );
-                      if (date != null) {
-                        setState(() {
-                          _dateFin = date;
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
+              _buildTextField(_controleurTitre, 'Titre'),
+              const SizedBox(height: 20),
+              _buildTextField(_controleurPrix, 'Prix', TextInputType.number),
+              const SizedBox(height: 20),
+              _buildTextField(
+                  _controleurDescription, 'Description', TextInputType.text, 3),
+              const SizedBox(height: 20),
+              _buildDatePicker(
+                  'Date de début :', _dateDebut, (date) => _dateDebut = date!),
+              const SizedBox(height: 20),
+              _buildDatePicker(
+                  'Date de fin :', _dateFin, (date) => _dateFin = date!),
+              const SizedBox(height: 20),
               ElevatedButton(
                 child: const Text('Sélectionner des images'),
-                onPressed: offreService.selectionnerImages,
-              ),
-              ElevatedButton(
-                child: const Text('Sélectionner un PDF'),
-                onPressed: offreService.selectionnerPdf,
-              ),
-              ElevatedButton(
-                child: const Text('Créer une offre'),
-                onPressed: () {
-                  final titre = _controleurTitre.text;
-                  final prix = double.tryParse(_controleurPrix.text);
-                  final description = _controleurDescription.text;
-
-                  if (titre.isNotEmpty &&
-                      prix != null &&
-                      description.isNotEmpty) {
-                    offreService.creerOffre(
-                      titre: titre,
-                      prix: prix,
-                      description: description,
-                      dateDebut: _dateDebut,
-                      dateFin: _dateFin,
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Veuillez remplir tous les champs et vérifier le format du prix.',
-                        ),
-                      ),
-                    );
+                onPressed: () async {
+                  List<String>? images =
+                      await offreService.selectionnerImages();
+                  if (images != null) {
+                    setState(() {
+                      _imagesSelectionnees.addAll(images);
+                    });
                   }
                 },
+              ),
+              _buildDocumentList(
+                  _imagesSelectionnees, 'Images sélectionnées :'),
+              const SizedBox(height: 20),
+              _buildDocumentList(_pdfsSelectionnes, 'PDFs sélectionnés :'),
+              ElevatedButton(
+                child: const Text('Sélectionner un PDF'),
+                onPressed: () async {
+                  String? pdf = await offreService.selectionnerPdf();
+                  if (pdf != null) {
+                    setState(() {
+                      _pdfSelectionne = pdf;
+                    });
+                  } else {
+                    final snackBar = SnackBar(
+                      content: Text('Aucun PDF sélectionné.'),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                },
+              ),
+              if (_pdfSelectionne != null) _buildSelectedPdf(),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                child: const Text('Créer une offre'),
+                onPressed: () => _creerOffre(context, offreService),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  TextFormField _buildTextField(
+      TextEditingController controller, String labelText,
+      [TextInputType keyboardType = TextInputType.text, int maxLines = 1]) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: labelText),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+    );
+  }
+
+  Widget _buildDatePicker(String labelText, DateTime initialDate,
+      Function(DateTime?) onDateSelected) {
+    return Row(
+      children: [
+        Text('$labelText ${_formatDate.format(initialDate)}'),
+        ElevatedButton(
+          child: const Text('Sélectionner'),
+          onPressed: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: initialDate,
+              firstDate: DateTime.now(),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
+            if (date != null) {
+              setState(() {
+                onDateSelected(date);
+              });
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectedImages() {
+    if (_imagesSelectionnees != null && _imagesSelectionnees!.isNotEmpty) {
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: _imagesSelectionnees!.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(_imagesSelectionnees![index]),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                setState(() {
+                  _imagesSelectionnees!.removeAt(index);
+                });
+              },
+            ),
+          );
+        },
+      );
+    } else {
+      return Text('Aucune image sélectionnée.');
+    }
+  }
+
+  Widget _buildSelectedPdf() {
+    if (_pdfSelectionne != null) {
+      return ListTile(
+        title: Text(_pdfSelectionne!),
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () {
+            setState(() {
+              _pdfSelectionne = null;
+            });
+          },
+        ),
+      );
+    } else {
+      return Text('Aucun PDF sélectionné.');
+    }
+  }
+
+  void _creerOffre(BuildContext context, OffreService offreService) {
+    final titre = _controleurTitre.text;
+    final prix = double.tryParse(_controleurPrix.text);
+    final description = _controleurDescription.text;
+
+    if (titre.isNotEmpty && prix != null && description.isNotEmpty) {
+      offreService.creerOffre(
+        titre: titre,
+        prix: prix,
+        description: description,
+        dateDebut: _dateDebut,
+        dateFin: _dateFin,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Veuillez remplir tous les champs et vérifier le format du prix.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildDocumentList(List<String>? documents, String labelText) {
+    if (documents == null || documents.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(labelText),
+        for (var document in documents)
+          ListTile(
+            title: Text(document),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                setState(() {
+                  documents.remove(document);
+                });
+              },
+            ),
+          ),
+      ],
     );
   }
 }
