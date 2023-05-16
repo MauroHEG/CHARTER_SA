@@ -123,7 +123,7 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text(
                           'Veuillez remplir tous les champs et vérifier le format du prix.',
                         ),
