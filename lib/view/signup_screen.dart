@@ -22,7 +22,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _password,
       _confirmPassword,
       _phoneNumber;
-  DateTime? _dateOfBirth;
 
   @override
   Widget build(BuildContext context) {
