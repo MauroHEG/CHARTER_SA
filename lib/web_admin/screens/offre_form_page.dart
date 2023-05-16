@@ -15,7 +15,7 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
   final _controleurPrix = TextEditingController();
   final _controleurDescription = TextEditingController();
   DateTime _dateDebut = DateTime.now();
-  DateTime _dateFin = DateTime.now().add(Duration(days: 7));
+  DateTime _dateFin = DateTime.now().add(const Duration(days: 7));
 
   final _formatDate = DateFormat('dd/MM/yyyy');
 
@@ -33,7 +33,7 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Créer une offre'),
+        title: const Text('Créer une offre'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -42,29 +42,29 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
             children: [
               TextFormField(
                 controller: _controleurTitre,
-                decoration: InputDecoration(labelText: 'Titre'),
+                decoration: const InputDecoration(labelText: 'Titre'),
               ),
               TextFormField(
                 controller: _controleurPrix,
-                decoration: InputDecoration(labelText: 'Prix'),
+                decoration: const InputDecoration(labelText: 'Prix'),
                 keyboardType: TextInputType.number,
               ),
               TextFormField(
                 controller: _controleurDescription,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 maxLines: 3,
               ),
               Row(
                 children: [
                   Text('Date de début : ${_formatDate.format(_dateDebut)}'),
                   ElevatedButton(
-                    child: Text('Sélectionner'),
+                    child: const Text('Sélectionner'),
                     onPressed: () async {
                       final date = await showDatePicker(
                         context: context,
                         initialDate: _dateDebut,
                         firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
                       if (date != null) {
                         setState(() {
@@ -79,13 +79,13 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
                 children: [
                   Text('Date de fin : ${_formatDate.format(_dateFin)}'),
                   ElevatedButton(
-                    child: Text('Sélectionner'),
+                    child: const Text('Sélectionner'),
                     onPressed: () async {
                       final date = await showDatePicker(
                         context: context,
                         initialDate: _dateFin,
                         firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
                       if (date != null) {
                         setState(() {
@@ -97,15 +97,15 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
                 ],
               ),
               ElevatedButton(
-                child: Text('Sélectionner des images'),
+                child: const Text('Sélectionner des images'),
                 onPressed: offreService.selectionnerImages,
               ),
               ElevatedButton(
-                child: Text('Sélectionner un PDF'),
+                child: const Text('Sélectionner un PDF'),
                 onPressed: offreService.selectionnerPdf,
               ),
               ElevatedButton(
-                child: Text('Créer une offre'),
+                child: const Text('Créer une offre'),
                 onPressed: () {
                   final titre = _controleurTitre.text;
                   final prix = double.tryParse(_controleurPrix.text);
