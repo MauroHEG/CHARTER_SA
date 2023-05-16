@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../view/services/offre_service.dart';
 import 'offres_detail_page.dart';
 import 'offre_form_page.dart';
 
@@ -11,15 +12,7 @@ class OffresListPage extends StatefulWidget {
 }
 
 class _OffresListPageState extends State<OffresListPage> {
-  final Stream<QuerySnapshot> _offresStream =
-      FirebaseFirestore.instance.collection('offres').snapshots();
-
-  Future<void> _supprimerOffre(String documentId) async {
-    await FirebaseFirestore.instance
-        .collection('offres')
-        .doc(documentId)
-        .delete();
-  }
+  final OffreService _offreService = OffreService();
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +22,14 @@ class _OffresListPageState extends State<OffresListPage> {
         title: const Text('Liste des offres'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _offresStream,
+        stream: _offreService.getOffresStream(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Text('Erreur: ${snapshot.error}');
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text('Chargement...');
+            return const CircularProgressIndicator();
           }
 
           return ListView(
@@ -48,7 +41,7 @@ class _OffresListPageState extends State<OffresListPage> {
               bool estProche = currentDate.isBefore(dateDebut);
               bool estExpire = currentDate.isAfter(dateFin);
               if (estExpire) {
-                _supprimerOffre(document.id);
+                _offreService.supprimerOffre(document.id);
               }
               return InkWell(
                 onTap: !estProche
@@ -98,7 +91,8 @@ class _OffresListPageState extends State<OffresListPage> {
                                     ),
                                     TextButton(
                                       onPressed: () async {
-                                        await _supprimerOffre(document.id);
+                                        await _offreService
+                                            .supprimerOffre(document.id);
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text('Supprimer'),
@@ -120,7 +114,7 @@ class _OffresListPageState extends State<OffresListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const PageFormulaireOffre(),
+              builder: (context) => const CreerOffrePage(),
             ),
           );
         },

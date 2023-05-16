@@ -1,4 +1,5 @@
 import 'package:charter_appli_travaux_mro/view/login_screen.dart';
+import 'package:charter_appli_travaux_mro/view/services/offre_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => UserInfoProvider()),
         ChangeNotifierProvider(create: (context) => NotificationProvider()),
+        Provider(create: (context) => OffreService()), // ajoutez ceci
       ],
       child: const MyApp(),
     ),
@@ -51,7 +53,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mon application',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green).copyWith(background: const Color(0xFFD9F5D0)),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)
+            .copyWith(background: const Color(0xFFD9F5D0)),
       ),
       home: const LoginScreen(),
     );

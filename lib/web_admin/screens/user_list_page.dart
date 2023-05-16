@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../view/services/user_service.dart';
+
 class UserListPage extends StatefulWidget {
   const UserListPage({super.key});
 
@@ -9,14 +11,9 @@ class UserListPage extends StatefulWidget {
 }
 
 class _UserListPageState extends State<UserListPage> {
-  CollectionReference users =
-      FirebaseFirestore.instance.collection('utilisateurs');
+  final UserService _userService =
+      UserService(); // Créez une instance du service
   String searchString = "";
-
-  Future<void> supprimerUtilisateur(String id) async {
-    await users.doc(id).delete();
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +37,8 @@ class _UserListPageState extends State<UserListPage> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: searchString.isEmpty
-                  ? users.snapshots()
-                  : users.orderBy('nom_lower').startAt([searchString]).endAt(
-                      [searchString + '\uf8ff']).snapshots(),
+              stream: _userService
+                  .getUsersStream(searchString), // Utilisez le service ici
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
@@ -86,7 +81,8 @@ class _UserListPageState extends State<UserListPage> {
                                     TextButton(
                                       child: const Text('Confirmer'),
                                       onPressed: () {
-                                        supprimerUtilisateur(document.id);
+                                        _userService.deleteUser(document
+                                            .id); // Utilisez le service ici
                                         Navigator.of(context).pop();
                                       },
                                     ),
