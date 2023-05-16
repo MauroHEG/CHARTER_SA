@@ -1,41 +1,31 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+
+class MockFirebaseAuth extends Mock implements FirebaseAuth {}
+
+class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
 void main() {
-  group('AuthService', () {
-    late AuthService authService;
-    late FirebaseAuth auth;
+  late MockFirebaseAuth mockFirebaseAuth;
+  late MockFirebaseFirestore mockFirebaseFirestore;
+  late AuthService authService;
 
-    setUp(() {
-      auth = MockFirebaseAuth(
-          mockUser: MockUser(
-        uid: '123456',
-        email: 'test@test.com',
-      ));
-      authService = AuthService(auth: auth);
-    });
+  setUp(() {
+    mockFirebaseAuth = MockFirebaseAuth();
+    mockFirebaseFirestore = MockFirebaseFirestore();
+    authService =
+        AuthService(auth: mockFirebaseAuth, firestore: mockFirebaseFirestore);
+  });
 
-    test('se connecter avec succès', () async {
-      await authService.seConnecter('test@test.com', 'password123');
+  test('seConnecter renvoie le bon message d\'erreur', () async {
+    when(mockFirebaseAuth.signInWithEmailAndPassword(
+            email: 'test@test.com', password: 'password'))
+        .thenThrow(FirebaseAuthException(code: 'user-not-found'));
 
-      // Vérifiez que l'utilisateur est connecté
-      expect(auth.currentUser!.email, 'test@test.com');
-    });
-
-    // Ce test vérifie si une exception est levée lorsque l'email ou le mot de passe sont incorrects
-    test('échec de la connexion avec des identifiants incorrects', () async {
-      auth = MockFirebaseAuth(signedIn: false);
-      authService = AuthService(auth: auth);
-
-      try {
-        await authService.seConnecter('test@test.com', 'wrong-password');
-        fail('L\'exception FirebaseAuthException n\'a pas été levée');
-      } catch (e) {
-        expect(e, isA<FirebaseAuthException>());
-      }
-    });
+    expect(await authService.seConnecter('test@test.com', 'password'),
+        "L'email ou le mot de passe sont incorrets. Veuillez réessayer");
   });
 }

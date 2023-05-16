@@ -1,6 +1,9 @@
 import 'package:charter_appli_travaux_mro/view/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../utils/appStrings.dart';
+import '../web_admin/screens/admin_dashboard_screen.dart';
+import 'home_screen.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -86,11 +89,43 @@ class _LoginScreenState extends State<LoginScreen> {
             height:
                 80), // Ajoutez cette ligne pour ajouter de l'espace au-dessus du bouton de connexion
         ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             if (!_formKey.currentState!.validate()) return;
             _formKey.currentState?.save();
-            _authService.seConnecter(_email, _password,
-                context: context); // Modifiez cette ligne
+
+            String result = await _authService.seConnecter(_email, _password);
+
+            if (result == 'admin') {
+              // Si l'utilisateur est un administrateur, naviguez vers AdminDashboardScreen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AdminDashboardScreen()),
+              );
+            } else if (result !=
+                    "L'email ou le mot de passe sont incorrets. Veuillez réessayer" &&
+                result != 'Une erreur est survenue. Veuillez réessayer') {
+              // Si l'utilisateur est un utilisateur normal, naviguez vers HomeScreen
+              String nom = await _authService
+                  .recupererNom(FirebaseAuth.instance.currentUser!.uid);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(
+                    avatarPath: '',
+                    fullName: nom,
+                  ),
+                ),
+              );
+            } else {
+              // Afficher le message d'erreur avec un SnackBar
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF7BF853),
@@ -107,6 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontSize:
                       20)), // Modifiez la taille du texte ici si nécessaire
         ),
+
         const SizedBox(height: 30), // Modifiez la hauteur si nécessaire
         ElevatedButton(
           onPressed: () {

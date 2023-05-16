@@ -44,26 +44,28 @@ void main() {
       expect(userDoc['role'], 'user');
     });
 
-    /*test('Un utilisateur est unique (pas deux fois la même adresse mail)',
-        () async {
+    test("Un utilisateur ne peut pas être en double dans Firebase", () async {
       // Les données pour l'inscription
-      const email = 'testDoublon@test.com';
-      const password = 'motdepasse';
-      const firstName = 'Double';
-      const lastName = 'Doubleur';
-      const phoneNumber = '0778547895';
+      const email = 'test@test.com';
+      const password = 'password';
+      const firstName = 'Jean';
+      const lastName = 'Dupont';
+      const phoneNumber = '0123456789';
 
-      await authService.enregistrerUtilisateur(
+      // Créer une instance de FirebaseAuth avec un utilisateur déjà inscrit
+      final auth = MockFirebaseAuth(
+          mockUser: MockUser(isAnonymous: false, uid: '123', email: email));
+
+      // Instancier le service avec l'instance de FirebaseAuth
+      final authService = AuthService(auth: auth, firestore: firestore);
+
+      // On essaie d'inscrire un deuxième utilisateur avec le même email
+      String? errorMessage = await authService.enregistrerUtilisateur(
           email, password, firstName, lastName, phoneNumber);
 
-      // Tenter d'inscrire un utilisateur avec la même adresse e-mail
-      // et vérifier si l'exception attendue est levée
-      expectLater(
-          authService.enregistrerUtilisateur(
-              email, password, firstName, lastName, phoneNumber),
-          throwsA(isA<FirebaseAuthException>().having((e) => e.message,
-              'message', "The email address is already in use.")));
-    });*/
+      // Vérifier que le bon message d'erreur est renvoyé
+      expect(errorMessage, 'Cet e-mail est déjà utilisé.');
+    });
   });
 
   test('champs obligatoire (peut pas sinscrire sans les champs obligatoires)',

@@ -1,15 +1,5 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:provider/provider.dart';
-
-import '../../providers/user_info_provider.dart';
-import '../../web_admin/screens/admin_dashboard_screen.dart';
-import '../home_screen.dart';
-import '../login_screen.dart';
 
 class AuthService {
   final FirebaseAuth _auth;
@@ -38,78 +28,44 @@ class AuthService {
         'role': 'user'
       });
     } on FirebaseAuthException catch (e) {
-      print(e.code);
-
       if (e.code == 'weak-password') {
         return 'Mot de passe trop faible';
-      } else if (e.message!.contains('The email address is already in use')) {
+      } else if (e.message!
+          .contains('The email address is already in use by another account')) {
         return 'Cet e-mail est déjà utilisé.';
       }
     } catch (e) {
-      return 'Erreur lors de l\'inscription : $e';
+      return 'Une erreur est survenue lors de l\'inscription.';
     }
 
     return null;
   }
 
-  Future<void> seConnecter(String email, String password,
-      {BuildContext? context}) async {
+  Future<String> seConnecter(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       String userId = userCredential.user!.uid;
-      String nom = await _recupererNom(userId);
 
       // Récupérez le rôle de l'utilisateur
-      String role = await _recupererRole(userId);
+      String role = await recupererRole(userId);
 
-      // Stockez le rôle dans le UserInfoProvider
-      Provider.of<UserInfoProvider>(context!, listen: false).setRole(role);
-
-      // Connexion réussie, naviguer vers l'écran d'accueil ou l'écran du tableau de bord administrateur
-      if (role == 'admin') {
-        // Si l'utilisateur est un administrateur, naviguez vers AdminDashboardScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-        );
-      } else {
-        // Si l'utilisateur est un utilisateur normal, naviguez vers HomeScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              avatarPath: '',
-              fullName: nom,
-            ),
-          ),
-        );
-      }
+      return role;
     } on FirebaseAuthException {
-      String messageErreur;
-
-      messageErreur =
-          "L'email ou le mot de passe sont incorrets. Veuillez réessayer";
-
-      // Afficher le message d'erreur avec un SnackBar
-      ScaffoldMessenger.of(context!).showSnackBar(
-        SnackBar(
-          content: Text(messageErreur),
-          backgroundColor: Colors.red,
-        ),
-      );
+      return "L'email ou le mot de passe sont incorrets. Veuillez réessayer";
     } catch (e) {
       print(e);
+      return 'Une erreur est survenue. Veuillez réessayer';
     }
   }
 
-  Future<String> _recupererNom(String userId) async {
+  Future<String> recupererNom(String userId) async {
     DocumentSnapshot doc =
         await _firestore.collection('utilisateurs').doc(userId).get();
     return doc['prenom'] + ' ' + doc['nom'];
   }
 
-  Future<String> _recupererRole(String userId) async {
+  Future<String> recupererRole(String userId) async {
     DocumentSnapshot doc =
         await _firestore.collection('utilisateurs').doc(userId).get();
     return doc['role'];

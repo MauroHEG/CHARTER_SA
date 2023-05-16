@@ -148,38 +148,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  /*Widget _buildDateOfBirthField() {
-    return GestureDetector(
-      onTap: () async {
-        DateTime? date = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
-        if (date != null) {
-          setState(() => _dateOfBirth = date);
-        }
-      },
-      child: AbsorbPointer(
-        child: TextFormField(
-          decoration: InputDecoration(
-            labelText: 'Date de naissance',
-            hintText: _dateOfBirth != null
-                ? '${_dateOfBirth?.day}/${_dateOfBirth?.month}/${_dateOfBirth?.year}'
-                : 'Sélectionnez une date',
-          ),
-          validator: (String? value) {
-            if (_dateOfBirth == null) {
-              return 'La date de naissance est obligatoire.';
-            }
-            return null;
-          },
-        ),
-      ),
-    );
-  }*/
-
   Widget _buildSignUpButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
