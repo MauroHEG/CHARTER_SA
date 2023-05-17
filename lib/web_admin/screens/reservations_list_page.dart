@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../view/services/reservation_service.dart';
+import '../../view/services/user_service.dart';
+
 class ReservationsListPage extends StatefulWidget {
   const ReservationsListPage({super.key});
 
@@ -12,14 +15,9 @@ class ReservationsListPage extends StatefulWidget {
 }
 
 class _ReservationsListPageState extends State<ReservationsListPage> {
-  CollectionReference reservations =
-      FirebaseFirestore.instance.collection('reservations');
+  final ReservationService reservationService = ReservationService();
+  final UserService userService = UserService();
   String searchCountryString = "";
-
-  Future<void> deleteReservation(String id) async {
-    await reservations.doc(id).delete();
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +42,7 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: reservations.snapshots(),
+              stream: reservationService.getReservations(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
@@ -89,7 +87,8 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
                           child: ListTile(
                             title: Text(donnees['nomPays']),
                             subtitle: FutureBuilder<String>(
-                              future: getUserName(donnees['utilisateur']),
+                              future: userService
+                                  .getUserName(donnees['utilisateur']),
                               builder: (BuildContext context,
                                   AsyncSnapshot<String> snapshot) {
                                 if (snapshot.hasData) {
@@ -123,10 +122,8 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
                                           child: const Text('CONFIRMER'),
                                           onPressed: () {
                                             // Supprimer la réservation de la base de données
-                                            FirebaseFirestore.instance
-                                                .collection('reservations')
-                                                .doc(document.id)
-                                                .delete();
+                                            reservationService
+                                                .deleteReservation(document.id);
                                             Navigator.of(context).pop();
                                           },
                                         ),
@@ -147,7 +144,7 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-// Naviguer vers la page de formulaire de réservation
+          // Naviguer vers la page de formulaire de réservation
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -159,13 +156,5 @@ class _ReservationsListPageState extends State<ReservationsListPage> {
         child: const Icon(Icons.add),
       ),
     );
-  }
-
-  Future<String> getUserName(String userId) async {
-    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-        .collection('utilisateurs')
-        .doc(userId)
-        .get();
-    return (userSnapshot.data() as Map<String, dynamic>)['nom'];
   }
 }

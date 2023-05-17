@@ -179,4 +179,11 @@ class OffreService {
       _urlPdfTelecharge = await ref.getDownloadURL();
     }
   }
+
+  Future<String> getDownloadUrl(String filePath) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child(filePath);
+    String downloadURL = await ref.getDownloadURL();
+    return downloadURL;
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../../view/services/offre_service.dart';
 
 class OffreDetailPage extends StatefulWidget {
   final Map<String, dynamic> offreData;
@@ -13,6 +14,8 @@ class OffreDetailPage extends StatefulWidget {
 }
 
 class _OffreDetailPageState extends State<OffreDetailPage> {
+  final OffreService offreService = OffreService();
+
   @override
   Widget build(BuildContext context) {
     DateFormat format = DateFormat("dd/MM/yyyy"); // Format de la date
@@ -76,10 +79,12 @@ class _OffreDetailPageState extends State<OffreDetailPage> {
                         onPressed: () async {
                           String? pdfLink = widget.offreData['pdf'];
                           if (pdfLink != null) {
-                            if (await canLaunch(pdfLink)) {
-                              await launch(pdfLink);
+                            String downloadUrl =
+                                await offreService.getDownloadUrl(pdfLink);
+                            if (await canLaunch(downloadUrl)) {
+                              await launch(downloadUrl);
                             } else {
-                              throw 'Impossible de lancer $pdfLink';
+                              throw 'Impossible de lancer $downloadUrl';
                             }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -120,12 +125,5 @@ class _OffreDetailPageState extends State<OffreDetailPage> {
         ),
       ),
     );
-  }
-
-  Future<String> getDownloadUrl(String filePath) async {
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child(filePath);
-    String downloadURL = await ref.getDownloadURL();
-    return downloadURL;
   }
 }

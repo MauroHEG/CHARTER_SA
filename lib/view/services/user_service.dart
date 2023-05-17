@@ -14,4 +14,12 @@ class UserService {
   Future<void> deleteUser(String id) async {
     await _users.doc(id).delete();
   }
+
+  Future<String> getUserName(String userId) async {
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+        .collection('utilisateurs')
+        .doc(userId)
+        .get();
+    return (userSnapshot.data() as Map<String, dynamic>)['nom'];
+  }
 }
