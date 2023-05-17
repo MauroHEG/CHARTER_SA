@@ -60,9 +60,8 @@ dependencies:
   firebase_messaging: ^14.4.0
   intl: ^0.17.0
   dio: ^4.0.0
+  flutter_downloader: ^1.7.1
 
-
-  
 dev_dependencies:
   flutter_test:
     sdk: flutter
