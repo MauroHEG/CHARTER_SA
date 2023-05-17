@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final CollectionReference _users =
       FirebaseFirestore.instance.collection('utilisateurs');
 
@@ -21,5 +24,9 @@ class UserService {
         .doc(userId)
         .get();
     return (userSnapshot.data() as Map<String, dynamic>)['nom'];
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
   }
 }

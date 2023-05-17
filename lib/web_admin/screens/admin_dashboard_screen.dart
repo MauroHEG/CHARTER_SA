@@ -1,15 +1,15 @@
+import 'package:charter_appli_travaux_mro/view/services/user_service.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/offres_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/reservations_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/review_list_page.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/user_list_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:charter_appli_travaux_mro/web_admin/screens/admin_conversations_screen.dart';
 
 import '../../utils/appStrings.dart';
 import '../../view/login_screen.dart';
+import '../../view/services/admin_dashboard_service.dart';
 
 enum ReservationType { all, offer, standard }
 
@@ -22,30 +22,8 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   ReservationType _reservationType = ReservationType.all;
-
-  Future<int> _getNombreTotalUtilisateurs() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('utilisateurs').get();
-    return querySnapshot.size;
-  }
-
-  Future<int> _getNombreTotalAvis() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('avis').get();
-    return querySnapshot.size;
-  }
-
-  Future<int> _getNombreTotalReservations() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('reservations').get();
-    return querySnapshot.size;
-  }
-
-  Future<int> _getNombreTotalOffres() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('offres').get();
-    return querySnapshot.size;
-  }
+  final AdminDashboardService _adminDashboardService = AdminDashboardService();
+  final UserService userService = UserService();
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +75,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 const SizedBox(height: 24),
                 FutureBuilder(
                   future: Future.wait([
-                    _getNombreTotalUtilisateurs(),
-                    _getNombreTotalAvis(),
-                    _getNombreTotalReservations(),
-                    _getNombreTotalOffres(),
+                    _adminDashboardService.getNombreTotalUtilisateurs(),
+                    _adminDashboardService.getNombreTotalAvis(),
+                    _adminDashboardService.getNombreTotalReservations(),
+                    _adminDashboardService.getNombreTotalOffres(),
                   ]),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<int>> snapshot) {
@@ -271,30 +249,23 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Future<List<int>> _getReservationsParMois() async {
-    List<int> reservationsParMois =
-        List.filled(12, 0); // Initialiser la liste avec zéro
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('reservations').get();
-
-    for (var doc in querySnapshot.docs) {
-      bool isOffer = (doc.data() as Map<String, dynamic>)['isOffer'];
-      if (_reservationType == ReservationType.all ||
-          (_reservationType == ReservationType.offer && isOffer) ||
-          (_reservationType == ReservationType.standard && !isOffer)) {
-        DateTime dateDebut =
-            (doc.data() as Map<String, dynamic>)['dateDebut'].toDate();
-        int mois = dateDebut.month - 1; // Ajuster l'index car il commence à 0
-        reservationsParMois[mois]++;
-      }
+  Widget _buildReservationsChart() {
+    Future<List<int>> Function()? getReservations;
+    switch (_reservationType) {
+      case ReservationType.all:
+        getReservations = _adminDashboardService.getReservationsParMois;
+        break;
+      case ReservationType.offer:
+        getReservations =
+            _adminDashboardService.getReservationsAvecOffreParMois;
+        break;
+      case ReservationType.standard:
+        getReservations = _adminDashboardService.getReservationsStandardParMois;
+        break;
     }
 
-    return reservationsParMois;
-  }
-
-  Widget _buildReservationsChart() {
     return FutureBuilder(
-      future: _getReservationsParMois(),
+      future: getReservations!(),
       builder: (context, snapshot) {
         // Si les données sont en train de charger
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -381,7 +352,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Future<void> _deconnexionEtRedirection() async {
-    await FirebaseAuth.instance.signOut();
+    await userService.signOut();
+    // ignore: use_build_context_synchronously
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
