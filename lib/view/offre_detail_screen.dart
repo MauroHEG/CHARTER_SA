@@ -80,7 +80,16 @@ class _OffreDetailScreenState extends State<OffreDetailScreen> {
                 itemBuilder:
                     (BuildContext context, int itemIndex, int pageViewIndex) =>
                         Container(
-                  child: Image.network(images[itemIndex], fit: BoxFit.cover),
+                  child: Image.network(
+                    images[itemIndex],
+                    fit: BoxFit.cover,
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      // Vous pouvez retourner un widget d'erreur ici si l'image ne peut pas être chargée
+                      return const Center(
+                          child: Text('Erreur de chargement de l\'image'));
+                    },
+                  ),
                 ),
                 options: CarouselOptions(
                   autoPlay: true,
