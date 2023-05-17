@@ -11,6 +11,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 //import 'package:mime/mime.dart';
 import 'package:mime_type/mime_type.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:charter_appli_travaux_mro/models/offre.dart';
 
 class OffreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -21,6 +23,7 @@ class OffreService {
   String? _nomPdfSelectionne;
   List<String>? _urlsImagesTelechargees;
   String? _urlPdfTelecharge;
+  final _offresCollection = FirebaseFirestore.instance.collection('offres');
 
   final CollectionReference _offres =
       FirebaseFirestore.instance.collection('offres');

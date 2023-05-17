@@ -160,8 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Offres Charter') {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => const OffresCharterScreen()),
+              MaterialPageRoute(builder: (context) => OffresCharterScreen()),
             );
           }
         },
