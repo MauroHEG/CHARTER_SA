@@ -22,7 +22,14 @@ class ReservationService {
   }
 
   String formatDate(Map<String, dynamic> reservationData, String dateType) {
-    DateTime date = (reservationData[dateType] as Timestamp).toDate();
-    return DateFormat('dd/MM/yyyy').format(date);
+    try {
+      if (reservationData[dateType] != null) {
+        DateTime date = (reservationData[dateType] as Timestamp).toDate();
+        return DateFormat('dd/MM/yyyy').format(date);
+      }
+    } catch (e) {
+      print('Erreur lors de la conversion de la date: $e');
+    }
+    return 'Pas de date spécifiée';
   }
 }

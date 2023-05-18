@@ -1,11 +1,14 @@
+import 'package:charter_appli_travaux_mro/view/services/reservation_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 class ReservationDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> reservationDetails;
 
-  const ReservationDetailsScreen({super.key, required this.reservationDetails});
+  ReservationDetailsScreen({super.key, required this.reservationDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +68,22 @@ class ReservationDetailsScreen extends StatelessWidget {
                 icon: FontAwesomeIcons.suitcase,
                 label: 'Description du voyage',
                 value: reservationDetails['descriptionVoyage']),
+            _buildDetailItem(
+              icon: FontAwesomeIcons.calendarAlt,
+              label: 'Date de début',
+              value: reservationDetails['dateDebut'] != null
+                  ? DateFormat('dd/MM/yyyy').format(
+                      (reservationDetails['dateDebut'] as Timestamp).toDate())
+                  : 'Pas de date de début spécifiée',
+            ),
+            _buildDetailItem(
+              icon: FontAwesomeIcons.calendarAlt,
+              label: 'Date de fin',
+              value: reservationDetails['dateFin'] != null
+                  ? DateFormat('dd/MM/yyyy').format(
+                      (reservationDetails['dateFin'] as Timestamp).toDate())
+                  : 'Pas de date de fin spécifiée',
+            ),
           ],
         ),
       ),
