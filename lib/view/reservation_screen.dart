@@ -40,7 +40,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF7BF853),
-        title: const Text("Mes réservations", style: TextStyle(color: Colors.black)),
+        title: const Text("Mes réservations",
+            style: TextStyle(color: Colors.black)),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _reservationsStream,
@@ -64,7 +65,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 child: ListTile(
                   title: Text(
                     'Réservation ${index + 1} - ${reservations[index].nomPays} - ${reservations[index].nomVille}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
                     Navigator.push(

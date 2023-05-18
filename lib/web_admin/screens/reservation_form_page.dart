@@ -293,7 +293,7 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           // Si le formulaire est valide, affiche un Snackbar
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -322,14 +322,24 @@ class _ReservationFormPageState extends State<ReservationFormPage> {
                           };
 
                           if (widget.isEditMode) {
-                            FirebaseFirestore.instance
+                            await FirebaseFirestore.instance
                                 .collection('reservations')
                                 .doc(widget.reservationData!['id'])
                                 .update(data);
                           } else {
-                            FirebaseFirestore.instance
+                            // Créer la réservation et obtenir l'ID
+                            DocumentReference docRef = await FirebaseFirestore
+                                .instance
                                 .collection('reservations')
                                 .add(data);
+
+                            // Ajouter la réservation à la sous-collection "reservation" de l'utilisateur
+                            await FirebaseFirestore.instance
+                                .collection('utilisateurs')
+                                .doc(_selectedUser)
+                                .collection('reservations')
+                                .doc(docRef.id)
+                                .set(data);
                           }
 
                           Navigator.pop(context);
