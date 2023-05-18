@@ -1,4 +1,5 @@
 import 'package:charter_appli_travaux_mro/models/reservation.dart';
+import 'package:charter_appli_travaux_mro/view/review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:charter_appli_travaux_mro/view/reservation_details_screen.dart';
@@ -61,12 +62,33 @@ class _ReservationScreenState extends State<ReservationScreen> {
           return ListView.builder(
             itemCount: reservations.length,
             itemBuilder: (BuildContext context, int index) {
+              DateTime finReservation =
+                  (reservations[index].dateFin as Timestamp).toDate();
+              bool reservationTerminee = DateTime.now().isAfter(finReservation);
+
               return Card(
                 child: ListTile(
                   title: Text(
                     'Réservation ${index + 1} - ${reservations[index].nomPays} - ${reservations[index].nomVille}',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  trailing: ElevatedButton(
+                    child: const Text('Poster un avis'),
+                    onPressed: reservationTerminee
+                        ? () {
+                            // Votre logique pour poster un avis va ici
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReviewScreen(
+                                  destination: '',
+                                  ville: '',
+                                ),
+                              ),
+                            );
+                          }
+                        : null,
                   ),
                   onTap: () {
                     Navigator.push(
