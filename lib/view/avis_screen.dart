@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import '../models/avis.dart';
 
-class AvisScreen extends StatefulWidget {
+
+/*class AvisScreen extends StatefulWidget {
   const AvisScreen({super.key});
 
   @override
@@ -79,4 +78,4 @@ class _AvisScreenState extends State<AvisScreen> {
       ),
     );
   }
-}
+}*/

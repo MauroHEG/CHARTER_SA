@@ -1,3 +1,4 @@
+import 'package:charter_appli_travaux_mro/models/avis.dart';
 import 'package:charter_appli_travaux_mro/view/reservation_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -153,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Avis') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AvisScreen()),
+              MaterialPageRoute(builder: (context) => DocumentsScreen()),
             );
           }
 

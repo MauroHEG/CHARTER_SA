@@ -77,13 +77,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
                     child: const Text('Poster un avis'),
                     onPressed: reservationTerminee
                         ? () {
-                            // Votre logique pour poster un avis va ici
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ReviewScreen(
-                                  destination: '',
-                                  ville: '',
+                                  userId: widget.userId,
+                                  reservationDetails:
+                                      reservations[index].toMap(),
                                 ),
                               ),
                             );
