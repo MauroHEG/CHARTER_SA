@@ -95,7 +95,40 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
                         ),
                       );
                     }
-                  });
+                  },
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Confirmation'),
+                            content: Text(
+                                'Êtes-vous sûr de vouloir supprimer ce fichier?'),
+                            actions: [
+                              TextButton(
+                                child: Text('Annuler'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text(
+                                  'Supprimer',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await _supprimerFichier(fichierSnapshot);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ));
             },
           );
         },
@@ -143,5 +176,18 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
     }).catchError((onError) {
       print(onError);
     });
+  }
+
+  Future<void> _supprimerFichier(DocumentSnapshot fichierSnapshot) async {
+    // Supprimer le fichier du stockage Firebase
+    String filePath = fichierSnapshot.get('url').replaceAll(
+        new RegExp(
+            r'https://firebasestorage.googleapis.com/v0/b/[your-project-id].appspot.com/o/'),
+        '');
+    filePath = Uri.decodeFull(filePath);
+    await _storage.ref().child(filePath).delete();
+
+    // Supprimer le document de Firestore
+    await fichierSnapshot.reference.delete();
   }
 }
