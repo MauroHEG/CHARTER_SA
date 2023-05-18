@@ -1,4 +1,5 @@
 class Avis {
+  final String userId;
   final String destination;
   final String ville;
   final String? titre;
@@ -6,13 +7,15 @@ class Avis {
   final int? note;
   final List<String>? images; // Liste d'URLs des images
 
-  Avis(
-      {required this.destination,
-      required this.ville,
-      this.titre,
-      this.avis,
-      this.note,
-      this.images});
+  Avis({
+    required this.userId,
+    required this.destination,
+    required this.ville,
+    this.titre,
+    this.avis,
+    this.note,
+    this.images,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -23,5 +26,17 @@ class Avis {
       'note': note,
       'images': images,
     };
+  }
+
+  static Avis fromMap(Map<String, dynamic> map) {
+    return Avis(
+      userId: map['userId'] ?? '',
+      destination: map['destination'] ?? '',
+      ville: map['ville'] ?? '',
+      titre: map['titre'],
+      avis: map['avis'],
+      note: map['note'] ?? 0,
+      images: map['images'] != null ? List<String>.from(map['images']) : [],
+    );
   }
 }

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/appStrings.dart';
-import 'avis_screen.dart';
+import 'liste_avis_screen.dart';
 import 'client_chat_button.dart';
 import 'documents_screen.dart';
 import 'login_screen.dart';
@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (text == 'Avis') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DocumentsScreen()),
+              MaterialPageRoute(builder: (context) => ListeAvisScreen()),
             );
           }
 

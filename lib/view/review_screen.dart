@@ -159,6 +159,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         _formKey.currentState!.save();
                         await _uploadImages();
                         Avis avis = Avis(
+                          userId: widget.userId,
                           destination: widget.reservationDetails['nomPays'],
                           ville: widget.reservationDetails['nomVille'],
                           titre: _titreController.text,
