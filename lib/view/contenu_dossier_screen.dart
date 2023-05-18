@@ -1,15 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:charter_appli_travaux_mro/view/pdf_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ContenuDossierScreen extends StatefulWidget {
   final String dossierId;
@@ -55,32 +59,43 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
             itemBuilder: (BuildContext context, int index) {
               DocumentSnapshot fichierSnapshot = snapshot.data!.docs[index];
               return ListTile(
-                leading: const Icon(Icons.picture_as_pdf),
-                title: Text(fichierSnapshot.get('nom')),
-                onTap: () async {
-                  String? url = fichierSnapshot.get('url');
-                  String? nom = fichierSnapshot.get('nom');
-                  if (url != null && nom != null) {
-                    var response = await http.get(Uri.parse(url));
-                    var documentDir = await getApplicationDocumentsDirectory();
-                    var downloadDir = Directory('${documentDir.path}/Download');
-                    await downloadDir.create();
-                    File file = File('${downloadDir.path}/$nom');
-                    await file.writeAsBytes(response.bodyBytes);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                  leading: const Icon(Icons.picture_as_pdf),
+                  title: Text(fichierSnapshot.get('nom')),
+                  onTap: () async {
+                    String? url = fichierSnapshot.get('url');
+                    String? nom = fichierSnapshot.get('nom');
+                    if (url != null && nom != null) {
+                      PermissionStatus status = await Permission.storage.status;
+                      if (!status.isGranted) {
+                        status = await Permission.storage.request();
+                      }
+                      if (status.isGranted) {
+                        var response = await http.get(Uri.parse(url));
+                        var documentDir =
+                            await getApplicationDocumentsDirectory();
+                        var downloadDir =
+                            Directory('${documentDir.path}/Download');
+                        await downloadDir.create();
+                        File file = File('${downloadDir.path}/$nom');
+                        await file.writeAsBytes(response.bodyBytes);
+                        OpenFile.open(file.path);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content:
+                                Text("Permission de stockage non accordée"),
+                          ),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
                           content:
-                              Text("Le fichier a été téléchargé avec succès")),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text("Erreur lors du téléchargement du fichier")),
-                    );
-                  }
-                },
-              );
+                              Text("Erreur lors du téléchargement du fichier"),
+                        ),
+                      );
+                    }
+                  });
             },
           );
         },

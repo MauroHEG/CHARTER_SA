@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:charter_appli_travaux_mro/providers/user_info_provider.dart';
 import 'package:charter_appli_travaux_mro/providers/notification_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   // Initialisation de Firebase

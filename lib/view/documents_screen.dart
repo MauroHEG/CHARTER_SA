@@ -19,11 +19,12 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF7BF853),
-        title: const Text('Mes documents', style: TextStyle(color: Colors.black)),
+        title:
+            const Text('Mes documents', style: TextStyle(color: Colors.black)),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: const Color(0xFFD9F5D0),
+        color: Color.fromARGB(255, 255, 255, 255),
         child: StreamBuilder<QuerySnapshot>(
           stream: _firestoreService.getDossiers(),
           builder:
@@ -69,6 +70,12 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           nomDossier,
           style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
+        trailing: IconButton(
+          icon: const Icon(Icons.delete, color: Colors.red),
+          onPressed: () {
+            _confirmerSuppression(dossierId);
+          },
+        ),
         onTap: () {
           Navigator.push(
             context,
@@ -82,6 +89,44 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         },
       ),
     );
+  }
+
+  void _confirmerSuppression(String dossierId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Supprimer le dossier'),
+          content: const Text(
+              'Êtes-vous sûr de vouloir supprimer ce dossier ? Cette action est irréversible.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Supprimer'),
+              onPressed: () async {
+                await _supprimerDossier(dossierId);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _supprimerDossier(String dossierId) async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance
+        .collection('utilisateurs')
+        .doc(userId)
+        .collection('dossiers')
+        .doc(dossierId)
+        .delete();
   }
 
   void _ajouterDossier() async {
