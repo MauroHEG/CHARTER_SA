@@ -47,6 +47,11 @@ class _ReviewsListPageState extends State<ReviewsListPage> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      Icon(
+                        Icons.star,
+                        color: note < 3 ? Colors.red : Colors.amber,
+                        size: 20,
+                      ),
                       Text(
                         note.toString(),
                         style: TextStyle(
