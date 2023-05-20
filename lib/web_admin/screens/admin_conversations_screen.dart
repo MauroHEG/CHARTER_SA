@@ -43,40 +43,45 @@ class _AdminConversationsScreenState extends State<AdminConversationsScreen> {
                   orElse: () => '');
               String conversationId = document.id;
 
-              return ListTile(
-                title: FutureBuilder<DocumentSnapshot>(
-                  future:
-                      _firestore.collection('utilisateurs').doc(clientId).get(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return Text("Erreur : ${snapshot.error}");
-                    }
+              return FutureBuilder<DocumentSnapshot>(
+                future:
+                    _firestore.collection('utilisateurs').doc(clientId).get(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("Erreur : ${snapshot.error}");
+                  }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Text("Chargement...");
-                    }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    return Text(
-                        "${snapshot.data!['prenom']} ${snapshot.data!['nom']}");
-                  },
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.chat),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => ChatScreen(
-                          conversationId: conversationId,
-                          adminId: adminId,
-                          clientId:
-                              clientId, // Vous devez déterminer l'ID du client ici
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                  if (!snapshot.data!.exists) {
+                    // Si l'utilisateur n'existe pas, renvoyez un widget vide
+                    return SizedBox.shrink();
+                  }
+
+                  return ListTile(
+                    title: Text(
+                        "${snapshot.data!['prenom']} ${snapshot.data!['nom']}"),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.chat),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => ChatScreen(
+                              conversationId: conversationId,
+                              adminId: adminId,
+                              clientId:
+                                  clientId, // Vous devez déterminer l'ID du client ici
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               );
             }).toList(),
           );
