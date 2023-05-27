@@ -20,6 +20,17 @@ class ReviewScreen extends StatefulWidget {
   _ReviewScreenState createState() => _ReviewScreenState();
 }
 
+Future<bool> hasReview(String userId, String reservationId) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('utilisateurs')
+      .doc(userId)
+      .collection('avis')
+      .doc(reservationId)
+      .get();
+
+  return snapshot.exists;
+}
+
 class _ReviewScreenState extends State<ReviewScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titreController = TextEditingController();

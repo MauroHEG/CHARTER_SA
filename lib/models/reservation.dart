@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Reservation {
+  final String id; // Ajout de l'id
   final String adresseHotel;
   final String descriptionVoyage;
   final String heureDecollageArrivee;
@@ -15,7 +16,8 @@ class Reservation {
   final Timestamp dateFin;
 
   Reservation(
-      {required this.adresseHotel,
+      {required this.id, // Ajout de l'id
+      required this.adresseHotel,
       required this.descriptionVoyage,
       required this.heureDecollageArrivee,
       required this.heureDecollageDepart,
@@ -28,8 +30,10 @@ class Reservation {
       required this.dateDebut,
       required this.dateFin});
 
-  factory Reservation.fromMap(Map<String, dynamic> map) {
+  factory Reservation.fromMap(Map<String, dynamic> map, String id) {
+    // Ajout de l'id dans fromMap
     return Reservation(
+        id: id, // Ajout de l'id
         adresseHotel: map['adresseHotel'],
         descriptionVoyage: map['descriptionVoyage'],
         heureDecollageArrivee: map['heureDecollageArrivee'],
@@ -46,6 +50,7 @@ class Reservation {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id, // Ajout de l'id
       'nomHotel': nomHotel,
       'nomPays': nomPays,
       'nomVille': nomVille,
