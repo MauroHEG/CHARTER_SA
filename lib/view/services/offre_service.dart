@@ -6,8 +6,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:mime_type/mime_type.dart';
-import 'package:charter_appli_travaux_mro/models/offre.dart';
+import 'dart:convert';
+import 'dart:html' as html show File, FileReader, Blob;
+import 'dart:io' show Platform, File;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class OffreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -88,11 +90,12 @@ class OffreService {
     FirebaseStorage stockage = FirebaseStorage.instance;
     if (_imagesSelectionnees != null) {
       _urlsImagesTelechargees = [];
-      for (XFile image in _imagesSelectionnees!) {
+      for (var image in _imagesSelectionnees!) {
         String nomFichier =
             'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
         Reference ref = stockage.ref().child(nomFichier);
-        await ref.putFile(File(image.path));
+        Uint8List data = await image.readAsBytes();
+        await ref.putData(data);
         String urlTelechargement = await ref.getDownloadURL();
         _urlsImagesTelechargees!.add(urlTelechargement);
       }
@@ -105,6 +108,18 @@ class OffreService {
       await ref.putData(_octetsPdfSelectionne!);
       _urlPdfTelecharge = await ref.getDownloadURL();
     }
+  }
+
+  Future<Uint8List> _readData(html.File file) {
+    final Completer<Uint8List> completer = Completer();
+    final html.FileReader reader = html.FileReader();
+    reader.readAsDataUrl(file);
+    reader.onLoadEnd.listen((event) {
+      final String result = reader.result as String;
+      final String data = result.substring(result.indexOf(',') + 1);
+      completer.complete(base64.decode(data));
+    });
+    return completer.future;
   }
 
   Future<String> getDownloadUrl(String filePath) async {
