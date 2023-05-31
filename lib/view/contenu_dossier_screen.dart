@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:charter_appli_travaux_mro/view/pdf_view_screen.dart';
+import 'package:charter_appli_travaux_mro/view/pdf_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf_render/pdf_render.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ContenuDossierScreen extends StatefulWidget {
@@ -20,7 +20,8 @@ class ContenuDossierScreen extends StatefulWidget {
   final String dossierNom;
 
   const ContenuDossierScreen(
-      {super.key, required this.dossierId, required this.dossierNom});
+      {Key? key, required this.dossierId, required this.dossierNom})
+      : super(key: key);
 
   @override
   _ContenuDossierScreenState createState() => _ContenuDossierScreenState();
@@ -60,30 +61,38 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
               DocumentSnapshot fichierSnapshot = snapshot.data!.docs[index];
               return ListTile(
                   leading: const Icon(Icons.picture_as_pdf),
-                  title: Text(fichierSnapshot.get('nom')),
+                  title: Text(fichierSnapshot.get('nom').split('_').last),
                   onTap: () async {
                     String? url = fichierSnapshot.get('url');
                     String? nom = fichierSnapshot.get('nom');
                     if (url != null && nom != null) {
-                      PermissionStatus status = await Permission.storage.status;
-                      if (!status.isGranted) {
-                        status = await Permission.storage.request();
-                      }
-                      if (status.isGranted) {
-                        var response = await http.get(Uri.parse(url));
-                        var documentDir =
-                            await getApplicationDocumentsDirectory();
-                        var downloadDir =
-                            Directory('${documentDir.path}/Download');
-                        await downloadDir.create();
-                        File file = File('${downloadDir.path}/$nom');
-                        await file.writeAsBytes(response.bodyBytes);
-                        OpenFile.open(file.path);
-                      } else {
+                      try {
+                        // Download the PDF document
+                        var dio = Dio();
+                        var dir = await getApplicationDocumentsDirectory();
+                        var localPath = "${dir.path}/$nom";
+
+                        await dio.download(url, localPath);
+
+                        // Verify if file exists
+                        if (await File(localPath).exists()) {
+                          print('File downloaded successfully');
+                        } else {
+                          print('File download failed');
+                        }
+
+                        // Open the PDF view page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PdfViewPage(path: localPath)),
+                        );
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content:
-                                Text("Permission de stockage non accordée"),
+                                Text("Erreur lors du chargement du fichier"),
                           ),
                         );
                       }
@@ -166,6 +175,41 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
     UploadTask uploadTask = storageReference.putFile(file);
     await uploadTask.whenComplete(() async {
       String fileUrl = await storageReference.getDownloadURL();
+
+      String? newFileName = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          String? newName;
+          return AlertDialog(
+            title: Text('Renommer le fichier (Sans caractères spéciaux !)'),
+            content: TextField(
+              onChanged: (value) {
+                newName = value;
+              },
+              decoration:
+                  InputDecoration(hintText: "Entrez le nouveau nom du fichier"),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Annuler'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(newName);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      if (newFileName != null && newFileName.isNotEmpty) {
+        fileName = newFileName;
+      }
+
       await _firestore
           .collection('utilisateurs')
           .doc(userId)
@@ -182,9 +226,10 @@ class _ContenuDossierScreenState extends State<ContenuDossierScreen> {
     // Supprimer le fichier du stockage Firebase
     String filePath = fichierSnapshot.get('url').replaceAll(
         new RegExp(
-            r'https://firebasestorage.googleapis.com/v0/b/[your-project-id].appspot.com/o/'),
+            r'https://firebasestorage.googleapis.com/v0/b/charter-bd51b.appspot.com/o/'),
         '');
-    filePath = Uri.decodeFull(filePath);
+    filePath = Uri.decodeFull(filePath.split('?')[0]); // ajoutez cette ligne
+    print(filePath); // imprimer le chemin du fichier pour le débogage
     await _storage.ref().child(filePath).delete();
 
     // Supprimer le document de Firestore
