@@ -149,19 +149,6 @@ class _OffreDetailScreenState extends State<OffreDetailScreen> {
                   onPressed: downloading ? null : () => downloadPDF(),
                 ),
               ),
-              if (downloading)
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: CircularProgressIndicator(),
-                ),
-              SizedBox(height: 20),
-              if (localPath.isNotEmpty && !downloading)
-                Container(
-                  height: 300,
-                  child: PDFView(
-                    filePath: localPath,
-                  ),
-                ),
             ],
           ),
         ),
