@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'pdf_view_page.dart';
+
 class OffreDetailScreen extends StatefulWidget {
   final DocumentSnapshot offre;
 
@@ -37,6 +39,12 @@ class _OffreDetailScreenState extends State<OffreDetailScreen> {
       String fileName = "offre.pdf";
       localPath = "${dir.path}/$fileName";
       await Dio().download(url, localPath);
+
+      // Naviguer vers la nouvelle page après le téléchargement du fichier
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PdfViewPage(path: localPath)),
+      );
     }
 
     setState(() {
@@ -137,7 +145,7 @@ class _OffreDetailScreenState extends State<OffreDetailScreen> {
               Center(
                 child: ElevatedButton.icon(
                   icon: FaIcon(FontAwesomeIcons.fileDownload, size: 18.0),
-                  label: Text('Télécharger le PDF'),
+                  label: Text('Ouvrir le PDF'),
                   onPressed: downloading ? null : () => downloadPDF(),
                 ),
               ),
