@@ -1,12 +1,7 @@
 import 'package:charter_appli_travaux_mro/models/avis.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as Path;
-
-import 'dart:io';
 
 class ReviewScreen extends StatefulWidget {
   final String userId;
@@ -20,46 +15,11 @@ class ReviewScreen extends StatefulWidget {
   _ReviewScreenState createState() => _ReviewScreenState();
 }
 
-Future<bool> hasReview(String userId, String reservationId) async {
-  final snapshot = await FirebaseFirestore.instance
-      .collection('utilisateurs')
-      .doc(userId)
-      .collection('avis')
-      .doc(reservationId)
-      .get();
-
-  return snapshot.exists;
-}
-
 class _ReviewScreenState extends State<ReviewScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titreController = TextEditingController();
   final _avisController = TextEditingController();
   double _rating = 3;
-  List<File> _images = [];
-  List<String> _imageUrls = [];
-
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _images.add(File(image.path));
-      });
-    }
-  }
-
-  Future<void> _uploadImages() async {
-    for (var image in _images) {
-      String fileName = Path.basename(image.path);
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child('uploads/$fileName');
-      UploadTask uploadTask = firebaseStorageRef.putFile(image);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-      _imageUrls.add(downloadUrl);
-    }
-  }
 
   @override
   void dispose() {
@@ -146,29 +106,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     },
                   ),
                   SizedBox(height: 16.0),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    itemCount: _images.length + 1,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemBuilder: (context, index) {
-                      if (index == _images.length) {
-                        return IconButton(
-                          icon: Icon(Icons.add_a_photo),
-                          onPressed: _pickImage,
-                        );
-                      }
-                      return Image.file(_images[index]);
-                    },
-                  ),
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        await _uploadImages();
                         Avis avis = Avis(
                           userId: widget.userId,
                           destination: widget.reservationDetails['nomPays'],
@@ -176,7 +117,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           titre: _titreController.text,
                           avis: _avisController.text,
                           note: _rating.round(),
-                          images: _imageUrls,
                         );
 
                         FirebaseFirestore.instance.collection('avis').add({
@@ -186,7 +126,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           'titre': avis.titre,
                           'avis': avis.avis,
                           'note': avis.note,
-                          'images': avis.images,
                         });
 
                         FirebaseFirestore.instance
@@ -199,7 +138,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           'titre': avis.titre,
                           'avis': avis.avis,
                           'note': avis.note,
-                          'images': avis.images,
                         });
 
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

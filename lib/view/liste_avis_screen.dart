@@ -121,6 +121,15 @@ class _ListeAvisScreenState extends State<ListeAvisScreen> {
                               ),
                             ),
                             SizedBox(height: 8.0),
+                            Text(
+                              // Ajout de la description de l'avis ici
+                              avis.avis ?? 'Pas de description',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            SizedBox(height: 8.0),
                             RatingBarIndicator(
                               rating: avis.note!.toDouble(),
                               itemBuilder: (context, index) => Icon(

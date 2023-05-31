@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:convert';
-import 'dart:html' as html show File, FileReader, Blob;
-import 'dart:io' show Platform, File;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart' show ImageSource;
+import 'package:image_picker/image_picker.dart' show ImagePicker, XFile;
+import 'package:file_picker/file_picker.dart'
+    show FilePicker, FilePickerResult, FileType;
 
 class OffreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -52,6 +49,18 @@ class OffreService {
       });
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<String> getDownloadUrl(String filePath) async {
+    if (kIsWeb) {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference ref = storage.ref().child(filePath);
+      String downloadURL = await ref.getDownloadURL();
+      return downloadURL;
+    } else {
+      // Retourner une valeur par défaut ou traiter différemment pour les plates-formes mobiles
+      return 'Download URL not available on mobile';
     }
   }
 
@@ -108,24 +117,5 @@ class OffreService {
       await ref.putData(_octetsPdfSelectionne!);
       _urlPdfTelecharge = await ref.getDownloadURL();
     }
-  }
-
-  Future<Uint8List> _readData(html.File file) {
-    final Completer<Uint8List> completer = Completer();
-    final html.FileReader reader = html.FileReader();
-    reader.readAsDataUrl(file);
-    reader.onLoadEnd.listen((event) {
-      final String result = reader.result as String;
-      final String data = result.substring(result.indexOf(',') + 1);
-      completer.complete(base64.decode(data));
-    });
-    return completer.future;
-  }
-
-  Future<String> getDownloadUrl(String filePath) async {
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child(filePath);
-    String downloadURL = await ref.getDownloadURL();
-    return downloadURL;
   }
 }
