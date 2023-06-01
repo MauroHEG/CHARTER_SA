@@ -44,18 +44,14 @@ class _OffresListPageState extends State<OffresListPage> {
                 _offreService.supprimerOffre(document.id);
               }
               return InkWell(
-                onTap: !estProche
-                    ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OffreDetailPage(
-                              offreData: data,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OffreDetailPage(offreData: data),
+                    ),
+                  );
+                },
                 child: ListTile(
                   title: Text(
                     data['titre'],
@@ -69,40 +65,46 @@ class _OffresListPageState extends State<OffresListPage> {
                       color: estProche ? Colors.grey : Colors.black,
                     ),
                   ),
-                  trailing: estProche
-                      ? Text(
-                          'Débute le ${dateDebut.day}/${dateDebut.month}/${dateDebut.year}')
-                      : IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Confirmation'),
-                                  content: const Text(
-                                      'Voulez-vous vraiment supprimer cette offre ?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Annuler'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        await _offreService
-                                            .supprimerOffre(document.id);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Supprimer'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (estProche)
+                        Text(
+                          'Débute le ${dateDebut.day}/${dateDebut.month}/${dateDebut.year}',
                         ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Confirmation'),
+                                content: const Text(
+                                    'Voulez-vous vraiment supprimer cette offre ?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Annuler'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      await _offreService
+                                          .supprimerOffre(document.id);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Supprimer'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             }).toList(),
@@ -110,13 +112,20 @@ class _OffresListPageState extends State<OffresListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const CreerOffrePage(),
             ),
           );
+          if (result != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result),
+              ),
+            );
+          }
         },
         tooltip: 'Créer une offre',
         child: const Icon(Icons.add),

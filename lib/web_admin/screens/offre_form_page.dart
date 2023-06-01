@@ -179,19 +179,20 @@ class _CreerOffrePageState extends State<CreerOffrePage> {
     }
   }
 
-  void _creerOffre(BuildContext context, OffreService offreService) {
+  void _creerOffre(BuildContext context, OffreService offreService) async {
     final titre = _controleurTitre.text;
     final prix = double.tryParse(_controleurPrix.text);
     final description = _controleurDescription.text;
 
     if (titre.isNotEmpty && prix != null && description.isNotEmpty) {
-      offreService.creerOffre(
+      await offreService.creerOffre(
         titre: titre,
         prix: prix,
         description: description,
         dateDebut: _dateDebut,
         dateFin: _dateFin,
       );
+      Navigator.pop(context, 'Offre créée');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

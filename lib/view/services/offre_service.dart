@@ -25,6 +25,13 @@ class OffreService {
     return _offres.snapshots();
   }
 
+  Stream<QuerySnapshot> getOffresStreamClient() {
+    return FirebaseFirestore.instance
+        .collection('offres')
+        .where('dateDebut', isLessThan: Timestamp.now())
+        .snapshots();
+  }
+
   Future<void> supprimerOffre(String documentId) async {
     await _offres.doc(documentId).delete();
   }

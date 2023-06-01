@@ -16,7 +16,7 @@ class _OffresCharterScreenState extends State<OffresCharterScreen> {
   @override
   void initState() {
     super.initState();
-    _offresStream = _offreService.getOffresStream();
+    _offresStream = _offreService.getOffresStreamClient();
   }
 
   @override
