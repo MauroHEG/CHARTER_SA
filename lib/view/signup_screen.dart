@@ -8,9 +8,6 @@ class SignUpScreen extends StatefulWidget {
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
-
-  void enregistrerUtilisateur(
-      String e, String p, String f, String l, String t) {}
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -69,6 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildFirstNameField() {
     return TextFormField(
+      key: Key('firstName'),
       decoration: const InputDecoration(labelText: 'Prénom'),
       validator: (String? value) {
         if (value!.isEmpty) return 'Le prénom est obligatoire.';
@@ -80,6 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildLastNameField() {
     return TextFormField(
+      key: Key('lastName'),
       decoration: const InputDecoration(labelText: 'Nom'),
       validator: (String? value) {
         if (value!.isEmpty) return 'Le nom est obligatoire.';
@@ -91,6 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildEmailField() {
     return TextFormField(
+      key: Key('email'),
       decoration: const InputDecoration(labelText: 'Email'),
       validator: (String? value) {
         if (value!.isEmpty) return 'L\'email est obligatoire.';
@@ -105,6 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildPasswordField() {
     return TextFormField(
+      key: Key('password'),
       decoration: const InputDecoration(labelText: 'Mot de passe'),
       obscureText: true,
       validator: (String? value) {
@@ -120,6 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildConfirmPasswordField() {
     return TextFormField(
+      key: Key('confirmPassword'),
       decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
       obscureText: true,
       validator: (String? value) {
@@ -137,6 +139,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildPhoneNumberField() {
     return TextFormField(
+      key: Key('phoneNumber'),
       decoration: const InputDecoration(labelText: 'Téléphone'),
       keyboardType: TextInputType.phone,
       validator: (String? value) {
@@ -149,6 +152,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
+      key: Key('signUpButton'),
       style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF7BF853),
           minimumSize: const Size(200, 60),

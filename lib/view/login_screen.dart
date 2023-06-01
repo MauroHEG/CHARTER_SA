@@ -56,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildEmailField() {
     return TextFormField(
+      key: Key('email'),
       decoration: const InputDecoration(labelText: 'Email'),
       validator: (String? value) {
         if (value!.isEmpty) return "L'email est obligatoire.";
@@ -70,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildPasswordField() {
     return TextFormField(
+      key: Key('password'),
       decoration: const InputDecoration(labelText: 'Mot de passe'),
       obscureText: true,
       validator: (String? value) {
@@ -89,6 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
             height:
                 80), // Ajoutez cette ligne pour ajouter de l'espace au-dessus du bouton de connexion
         ElevatedButton(
+          key: Key('loginButton'),
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;
             _formKey.currentState?.save();
@@ -145,6 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         const SizedBox(height: 30), // Modifiez la hauteur si nécessaire
         ElevatedButton(
+          key: Key('goToSignUp'),
           onPressed: () {
             Navigator.push(
               context,
